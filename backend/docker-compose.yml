@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: drive-form-postgres
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: drive_form
+    ports:
+      - "1999:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - drive-form-network
+
+networks:
+  drive-form-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
