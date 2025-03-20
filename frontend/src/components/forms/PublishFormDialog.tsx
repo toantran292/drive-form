@@ -19,7 +19,7 @@ import { FormSettings } from '@/types/form'
 interface PublishFormDialogProps {
     formId: string
     settings: FormSettings
-    onUpdateSettings: (settings: Partial<FormSettings>) => Promise<void>
+    onUpdateSettings: (settings: Partial<FormSettings>) => void
 }
 
 export function PublishFormDialog({
@@ -29,6 +29,13 @@ export function PublishFormDialog({
 }: PublishFormDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [publishing, setPublishing] = useState(false)
+
+    const handleSettingChange = (key: keyof FormSettings, value: any) => {
+        onUpdateSettings({
+            ...settings,
+            [key]: value
+        })
+    }
 
     const handlePublish = async () => {
         try {
@@ -112,7 +119,7 @@ export function PublishFormDialog({
                                     <Switch
                                         checked={settings.acceptingResponses}
                                         onCheckedChange={(checked) =>
-                                            onUpdateSettings({ acceptingResponses: checked })
+                                            handleSettingChange('acceptingResponses', checked)
                                         }
                                     />
                                 </div>
@@ -122,7 +129,7 @@ export function PublishFormDialog({
                                 variant="destructive"
                                 onClick={handleUnpublish}
                                 disabled={publishing}
-                                className="w-full"
+                                className="w-full text-white"
                             >
                                 Unpublish Form
                             </Button>
@@ -140,7 +147,7 @@ export function PublishFormDialog({
                                     <Switch
                                         checked={settings.allowAnonymous}
                                         onCheckedChange={(checked) =>
-                                            onUpdateSettings({ allowAnonymous: checked })
+                                            handleSettingChange('allowAnonymous', checked)
                                         }
                                     />
                                 </div>
@@ -155,7 +162,7 @@ export function PublishFormDialog({
                                     <Switch
                                         checked={settings.collectEmail}
                                         onCheckedChange={(checked) =>
-                                            onUpdateSettings({ collectEmail: checked })
+                                            handleSettingChange('collectEmail', checked)
                                         }
                                     />
                                 </div>

@@ -12,6 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { FiTrash2, FiCopy } from 'react-icons/fi'
+import { memo, useCallback } from 'react'
 
 interface QuestionEditorProps {
     question: Question
@@ -24,87 +25,99 @@ interface QuestionEditorProps {
 const getQuestionTypeLabel = (type: QuestionType): string => {
     switch (type) {
         case QuestionType.TEXT:
-            return 'Short answer';
-        // case QuestionType.PARAGRAPH:
-        //     return 'Long answer';
+            return 'Short answer'
         case QuestionType.MULTIPLE_CHOICE:
-            return 'Multiple choice';
+            return 'Multiple choice'
         case QuestionType.SINGLE_CHOICE:
-            return 'Single choice';
-        // case QuestionType.CHECKBOX:
-        //     return 'Checkboxes';
-        // case QuestionType.DROPDOWN:
-        //     return 'Dropdown';
-        // case QuestionType.FILE_UPLOAD:
-        //     return 'File upload';
-        // case QuestionType.DATE:
-        //     return 'Date';
-        // case QuestionType.TIME:
-        //     return 'Time';
-        // case QuestionType.LINEAR_SCALE:
-        //     return 'Linear scale';
-        // case QuestionType.MULTIPLE_CHOICE_GRID:
-        //     return 'Multiple choice grid';
-        // case QuestionType.CHECKBOX_GRID:
-        //     return 'Checkbox grid';
+            return 'Single choice'
         default:
-            return type;
+            return type
     }
-};
+}
 
 const questionTypeIcons = {
     [QuestionType.TEXT]: '✏️',
-    // [QuestionType.PARAGRAPH]: '📝',
     [QuestionType.MULTIPLE_CHOICE]: '⭕',
     [QuestionType.SINGLE_CHOICE]: '⭕',
-    // [QuestionType.CHECKBOX]: '☑️',
-    // [QuestionType.DROPDOWN]: '▼',
-    // [QuestionType.FILE_UPLOAD]: '📎',
-    // [QuestionType.DATE]: '📅',
-    // [QuestionType.TIME]: '⏰',
-    // [QuestionType.LINEAR_SCALE]: '📊',
-    // [QuestionType.MULTIPLE_CHOICE_GRID]: '📑',
-    // [QuestionType.CHECKBOX_GRID]: '🔲'
-};
+}
 
-export function QuestionEditor({
+function QuestionEditorComponent({
     question,
     onChange,
     onDelete,
     onDuplicate,
     disabled = false
 }: QuestionEditorProps) {
+    // Dùng useCallback để tránh tạo lại function mỗi lần render
+    const handleTitleChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (question.title === e.target.value) return
+            onChange({ ...question, title: e.target.value })
+        },
+        [question, onChange]
+    )
+
+    const handleDescriptionChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (question.description === e.target.value) return
+            onChange({ ...question, description: e.target.value })
+        },
+        [question, onChange]
+    )
+
+    const handleTypeChange = useCallback(
+        (value: string) => {
+            if (question.type === value) return
+            onChange({ ...question, type: value as QuestionType })
+        },
+        [question, onChange]
+    )
+
+    const handleOptionChange = useCallback(
+        (index: number, value: string) => {
+            const newOptions = [...(question.options || [])]
+            if (newOptions[index] === value) return
+            newOptions[index] = value
+            onChange({ ...question, options: newOptions })
+        },
+        [question, onChange]
+    )
+
+    const addOption = useCallback(() => {
+        onChange({
+            ...question,
+            options: [...(question.options || []), '']
+        })
+    }, [question, onChange])
+
     return (
         <div className="rounded-lg border bg-white p-6 group">
             <div className="flex items-start gap-4">
                 <div className="flex-1 space-y-4">
+                    {/* Question Title */}
                     <Input
-                        value={question.title}
-                        onChange={(e) =>
-                            onChange({ ...question, title: e.target.value })
-                        }
+                        defaultValue={question.title}
+                        onBlur={handleTitleChange}
                         placeholder="Question"
                         className="text-lg"
                         disabled={disabled}
                     />
 
+                    {/* Question Description (if exists) */}
                     {question.description !== undefined && (
                         <Input
-                            value={question.description}
-                            onChange={(e) =>
-                                onChange({ ...question, description: e.target.value })
-                            }
+                            defaultValue={question.description}
+                            onBlur={handleDescriptionChange}
                             placeholder="Description (optional)"
                             className="text-sm text-gray-600"
                             disabled={disabled}
                         />
                     )}
 
+                    {/* Select Question Type */}
                     <Select
                         value={question.type}
-                        onValueChange={(value) =>
-                            onChange({ ...question, type: value as QuestionType })
-                        }
+                        onValueChange={handleTypeChange}
                         disabled={disabled}
                     >
                         <SelectTrigger className="w-[200px]">
@@ -124,23 +137,17 @@ export function QuestionEditor({
                         </SelectContent>
                     </Select>
 
-                    {/* Question type specific options */}
+                    {/* Question Type Specific Fields */}
                     {(question.type === QuestionType.MULTIPLE_CHOICE || question.type === QuestionType.SINGLE_CHOICE) && (
                         <div className="space-y-2">
                             {question.options?.map((option, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <span className="text-gray-400">
-                                        {question.type === QuestionType.MULTIPLE_CHOICE && '○'}
-                                        {question.type === QuestionType.SINGLE_CHOICE && '⭕'}
-                                        {/* // {question.type === QuestionType.DROPDOWN && `${index + 1}.`} */}
+                                        {question.type === QuestionType.MULTIPLE_CHOICE ? '○' : '⭕'}
                                     </span>
                                     <Input
-                                        value={option}
-                                        onChange={(e) => {
-                                            const newOptions = [...(question.options || [])]
-                                            newOptions[index] = e.target.value
-                                            onChange({ ...question, options: newOptions })
-                                        }}
+                                        defaultValue={option}
+                                        onBlur={(e) => handleOptionChange(index, e.target.value)}
                                         placeholder={`Option ${index + 1}`}
                                         disabled={disabled}
                                     />
@@ -149,12 +156,7 @@ export function QuestionEditor({
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() =>
-                                    onChange({
-                                        ...question,
-                                        options: [...(question.options || []), '']
-                                    })
-                                }
+                                onClick={addOption}
                                 disabled={disabled}
                                 className="mt-2"
                             >
@@ -162,81 +164,9 @@ export function QuestionEditor({
                             </Button>
                         </div>
                     )}
-
-                    {/* Linear scale specific options */}
-                    {/* {question.type === QuestionType.LINEAR_SCALE && (
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <Input
-                                    type="number"
-                                    value={question.scale?.start ?? 1}
-                                    onChange={(e) =>
-                                        onChange({
-                                            ...question,
-                                            scale: {
-                                                ...question.scale,
-                                                start: parseInt(e.target.value)
-                                            }
-                                        })
-                                    }
-                                    className="w-20"
-                                    min={0}
-                                    max={10}
-                                    disabled={disabled}
-                                />
-                                <span>to</span>
-                                <Input
-                                    type="number"
-                                    value={question.scale?.end ?? 5}
-                                    onChange={(e) =>
-                                        onChange({
-                                            ...question,
-                                            scale: {
-                                                ...question.scale,
-                                                end: parseInt(e.target.value)
-                                            }
-                                        })
-                                    }
-                                    className="w-20"
-                                    min={1}
-                                    max={10}
-                                    disabled={disabled}
-                                />
-                            </div>
-                            <div className="flex gap-4">
-                                <Input
-                                    value={question.scale?.startLabel ?? ''}
-                                    onChange={(e) =>
-                                        onChange({
-                                            ...question,
-                                            scale: {
-                                                ...question.scale,
-                                                startLabel: e.target.value
-                                            }
-                                        })
-                                    }
-                                    placeholder="Start label (optional)"
-                                    disabled={disabled}
-                                />
-                                <Input
-                                    value={question.scale?.endLabel ?? ''}
-                                    onChange={(e) =>
-                                        onChange({
-                                            ...question,
-                                            scale: {
-                                                ...question.scale,
-                                                endLabel: e.target.value
-                                            }
-                                        })
-                                    }
-                                    placeholder="End label (optional)"
-                                    disabled={disabled}
-                                />
-                            </div>
-                        </div>
-                    )} */}
                 </div>
 
+                {/* Question Controls */}
                 <div className="flex flex-col items-center gap-2">
                     <Button
                         variant="ghost"
@@ -272,4 +202,14 @@ export function QuestionEditor({
             </div>
         </div>
     )
-} 
+}
+
+// Bọc component với React.memo để chặn re-render không cần thiết
+const QuestionEditor = memo(QuestionEditorComponent, (prevProps, nextProps) => {
+    return (
+        prevProps.question === nextProps.question &&
+        prevProps.disabled === nextProps.disabled
+    )
+})
+
+export { QuestionEditor }

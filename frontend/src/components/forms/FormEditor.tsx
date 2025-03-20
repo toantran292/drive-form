@@ -5,56 +5,97 @@ import { QuestionEditor } from './QuestionEditor'
 import { Button } from '@/components/ui/button'
 import { FiPlus } from 'react-icons/fi'
 import { Input } from '@/components/ui/input'
+import { useMemo, useCallback, memo, useRef } from 'react'
 
 interface FormEditorProps {
-    formId: string
-    form: Form
-    onChange: (form: Form) => Promise<void>
+    description: string
+    questions: Question[]
     saving?: boolean
+    onDescriptionChange: (newDescription: string) => void
+    onQuestionsChange: (updatedQuestions: Question[]) => void
 }
 
-export function FormEditor({ formId, form, onChange, saving = false }: FormEditorProps) {
-    const addQuestion = () => {
+function FormEditorComponent({
+    description,
+    questions,
+    saving = false,
+    onDescriptionChange,
+    onQuestionsChange
+}: FormEditorProps) {
+    // Dùng useRef để giữ danh sách câu hỏi, tránh tạo lại mảng mới khi không cần thiết
+    const questionsRef = useRef(questions)
+
+    useMemo(() => {
+        questionsRef.current = questions
+    }, [questions])
+
+    const handleDescriptionChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (description === e.target.value) return
+            onDescriptionChange(e.target.value)
+        },
+        [description, onDescriptionChange]
+    )
+
+    const addQuestion = useCallback(() => {
         const newQuestion: Question = {
             id: crypto.randomUUID(),
             type: QuestionType.TEXT,
             title: '',
             required: false,
         }
-        onChange({
-            ...form,
-            questions: [...form.questions, newQuestion]
-        })
-    }
 
-    const duplicateQuestion = (questionToDuplicate: Question) => {
-        const newQuestion: Question = {
-            ...questionToDuplicate,
-            id: crypto.randomUUID(),
-            title: `${questionToDuplicate.title}`,
-        }
+        const updatedQuestions = [...questionsRef.current, newQuestion]
+        questionsRef.current = updatedQuestions
+        onQuestionsChange(updatedQuestions)
+    }, [onQuestionsChange])
 
-        const index = form.questions.findIndex(q => q.id === questionToDuplicate.id)
+    const handleQuestionChange = useCallback(
+        (updatedQuestion: Question) => {
+            const updatedQuestions = questionsRef.current.map((q) =>
+                q.id === updatedQuestion.id ? updatedQuestion : q
+            )
+            questionsRef.current = updatedQuestions
+            onQuestionsChange(updatedQuestions)
+        },
+        [onQuestionsChange]
+    )
 
-        const updatedQuestions = [...form.questions]
-        updatedQuestions.splice(index + 1, 0, newQuestion)
+    const handleDeleteQuestion = useCallback(
+        (questionId: string) => {
+            const updatedQuestions = questionsRef.current.filter((q) => q.id !== questionId)
+            questionsRef.current = updatedQuestions
+            onQuestionsChange(updatedQuestions)
+        },
+        [onQuestionsChange]
+    )
 
-        onChange({
-            ...form,
-            questions: updatedQuestions
-        })
-    }
+    const duplicateQuestion = useCallback(
+        (questionToDuplicate: Question) => {
+            const newQuestion: Question = {
+                ...questionToDuplicate,
+                id: crypto.randomUUID(),
+                title: `${questionToDuplicate.title} (Copy)`,
+            }
+
+            const index = questionsRef.current.findIndex(q => q.id === questionToDuplicate.id)
+
+            const updatedQuestions = [...questionsRef.current]
+            updatedQuestions.splice(index + 1, 0, newQuestion)
+
+            questionsRef.current = updatedQuestions
+            onQuestionsChange(updatedQuestions)
+        },
+        [onQuestionsChange]
+    )
 
     return (
         <div className="mx-auto max-w-3xl space-y-4">
             {/* Form description */}
             <div className="rounded-lg border bg-white p-6">
                 <Input
-                    value={form.description || ''}
-                    onChange={(e) => onChange({
-                        ...form,
-                        description: e.target.value
-                    })}
+                    defaultValue={description}
+                    onBlur={handleDescriptionChange}
                     className="text-sm text-gray-600"
                     placeholder="Form description"
                     disabled={saving}
@@ -62,24 +103,12 @@ export function FormEditor({ formId, form, onChange, saving = false }: FormEdito
             </div>
 
             {/* Questions */}
-            {form.questions.map((question) => (
+            {questionsRef.current.map((question) => (
                 <QuestionEditor
                     key={question.id}
                     question={question}
-                    onChange={(updatedQuestion) => {
-                        onChange({
-                            ...form,
-                            questions: form.questions.map((q) =>
-                                q.id === question.id ? updatedQuestion : q
-                            )
-                        })
-                    }}
-                    onDelete={() => {
-                        onChange({
-                            ...form,
-                            questions: form.questions.filter((q) => q.id !== question.id)
-                        })
-                    }}
+                    onChange={handleQuestionChange}
+                    onDelete={() => handleDeleteQuestion(question.id)}
                     onDuplicate={() => duplicateQuestion(question)}
                     disabled={saving}
                 />
@@ -97,4 +126,8 @@ export function FormEditor({ formId, form, onChange, saving = false }: FormEdito
             </Button>
         </div>
     )
-} 
+}
+
+const FormEditor = memo(FormEditorComponent)
+
+export { FormEditor }

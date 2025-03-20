@@ -140,11 +140,9 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
 
     const handleFileClick = useCallback((file: DriveItem) => {
         if (file.type === 'file') {
-            onFileClick(file);
             setIsFileViewerOpen(true);
-        } else {
-            router.push(`?folderId=${file.id}`);
         }
+        onFileClick(file);
     }, [router, onFileClick]);
 
     const { folders, files } = sortAndGroupItems(items);

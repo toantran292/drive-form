@@ -2,42 +2,60 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { FiEye, FiSettings, FiSend, FiStar, FiSave } from 'react-icons/fi'
+import { FiEye, FiSettings, FiSend, FiStar, FiSave, FiCopy } from 'react-icons/fi'
 import { PublishFormDialog } from './PublishFormDialog'
 import { FormSettings } from '@/types/form'
+import { memo, useCallback } from 'react'
+import { toast } from 'sonner'
 
 interface FormHeaderProps {
     formId: string
     title: string
     settings: FormSettings
     onTitleChange: (title: string) => void
-    onUpdateSettings: (settings: Partial<FormSettings>) => Promise<void>
+    onUpdateSettings: (settings: Partial<FormSettings>) => void
     onSave: () => Promise<void>
-    onPublish: () => void
-    onUnpublish: () => void
     saving?: boolean
     hasUnsavedChanges?: boolean
 }
 
-export function FormHeader({
+function FormHeaderComponent({
     formId,
     title,
     settings,
     onTitleChange,
     onUpdateSettings,
     onSave,
-    onPublish,
-    onUnpublish,
     saving = false,
     hasUnsavedChanges = false
 }: FormHeaderProps) {
+
+    const handleTogglePublish = useCallback(() => {
+        onUpdateSettings({
+            ...settings,
+            isPublished: !settings.isPublished,
+            publishedAt: !settings.isPublished ? new Date() : undefined
+        })
+    }, [onUpdateSettings, settings])
+
+    const formUrl = `${window.location.origin}/forms/${formId}/view`
+
+    const handleCopyUrl = useCallback(async () => {
+        try {
+            await navigator.clipboard.writeText(formUrl)
+            toast.success('Form URL copied to clipboard')
+        } catch (err) {
+            toast.error('Failed to copy URL')
+        }
+    }, [formUrl])
+
     return (
-        <header className="sticky top-0 z-50 border-b bg-white">
+        <header className="fixed top-0 z-50 border-b bg-white w-full">
             <div className="flex h-14 items-center justify-between px-4">
                 <div className="flex items-center gap-4">
                     <Input
-                        value={title}
-                        onChange={(e) => onTitleChange(e.target.value)}
+                        defaultValue={title}
+                        onBlur={(e) => onTitleChange(e.target.value)}
                         className="h-9 w-64 bg-transparent px-2 text-lg font-medium"
                         placeholder="Untitled form"
                         disabled={saving}
@@ -57,27 +75,27 @@ export function FormHeader({
                         <FiSave className="h-4 w-4 mr-2" />
                         {saving ? 'Saving...' : 'Save'}
                     </Button>
-                    <Button variant="ghost" size="sm" disabled={saving}>
-                        <FiSettings className="h-4 w-4 mr-2" />
-                        Settings
+                    {settings.isPublished && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCopyUrl}
+                            className="gap-2"
+                        >
+                            <FiCopy className="h-4 w-4" />
+                            Copy URL
+                        </Button>
+                    )}
+                    <Button variant={settings.isPublished ? "outline" : "default"} onClick={handleTogglePublish}>
+                        <FiSend className="mr-2 h-4 w-4" />
+                        {settings.isPublished ? 'Published' : 'Publish'}
                     </Button>
-                    <Button variant="ghost" size="sm" disabled={saving}>
-                        <FiEye className="h-4 w-4 mr-2" />
-                        Preview
-                    </Button>
-                    <Button disabled={saving}>
-                        <FiSend className="h-4 w-4 mr-2" />
-                        Send
-                    </Button>
-                    <PublishFormDialog
-                        formId={formId}
-                        settings={settings}
-                        onUpdateSettings={onUpdateSettings}
-                    // onPublish={onPublish}
-                    // onUnpublish={onUnpublish}
-                    />
                 </div>
             </div>
         </header>
     )
-} 
+}
+
+const FormHeader = memo(FormHeaderComponent)
+
+export { FormHeader }

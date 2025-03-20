@@ -121,7 +121,7 @@ export default function FormViewPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Form Header */}
             <div
-                className="h-2 bg-gradient-to-r from-blue-500 to-blue-600"
+                className="h-2"
                 style={{ backgroundColor: form.settings.theme.color }}
             />
 

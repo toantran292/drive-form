@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, memo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { FormEditor } from '@/components/forms/FormEditor'
 import { FormHeader } from '@/components/forms/FormHeader'
@@ -8,15 +8,18 @@ import { FormSidebar } from '@/components/forms/FormSidebar'
 import { getForm, updateForm, Form } from '@/app/api/drive'
 import { toast } from 'sonner'
 import { useDebouncedCallback } from 'use-debounce'
-import axios from 'axios'
-import { FormSettings } from '@/types/form'
+import { FormSettings, Question } from '@/types/form'
 
 export default function FormEditorPage() {
     const router = useRouter()
     const { formId } = useParams()
+
     const [loading, setLoading] = useState(true)
-    const [form, setForm] = useState<Form | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [settings, setSettings] = useState<FormSettings | null>(null)
+    const [questions, setQuestions] = useState<Question[]>([])
     const [saving, setSaving] = useState(false)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
@@ -25,24 +28,11 @@ export default function FormEditorPage() {
             try {
                 setLoading(true)
                 const formData = await getForm(formId as string)
-                setForm(formData)
+                setTitle(formData.title)
+                setDescription(formData.description || '')
+                setSettings(formData.settings)
+                setQuestions(formData.questions as Question[])
                 setError(null)
-
-                // Kiểm tra quyền truy cập
-                // if (formData.ownerId !== 'current-user-id' && // Thay thế bằng ID user thực
-                //     !formData.sharedWith.some(share =>
-                //         share.userId === 'current-user-id' &&
-                //         share.permission === 'edit'
-                //     )) {
-                //     router.push('/drive')
-                //     toast.error('You do not have permission to edit this form')
-                //     return
-                // }
-
-                // // Kiểm tra form có active không
-                // if (!formData.isActive) {
-                //     toast.error('This form is no longer active')
-                // }
             } catch (err) {
                 console.error('Failed to load form:', err)
                 setError('Failed to load form')
@@ -57,7 +47,6 @@ export default function FormEditorPage() {
         }
     }, [formId, router])
 
-    // Xử lý khi người dùng rời trang mà chưa lưu
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (hasUnsavedChanges) {
@@ -71,22 +60,10 @@ export default function FormEditorPage() {
     }, [hasUnsavedChanges])
 
     const saveForm = async (updates: Partial<Form>) => {
-        if (!form) return
-
         try {
             setSaving(true)
-            const { form: updatedForm, driveItem } = await updateForm(formId as string, updates)
-            setForm(updatedForm)
+            await updateForm(formId as string, updates)
             setHasUnsavedChanges(false)
-
-            // Nếu title được update, cập nhật lại drive cache
-            if (driveItem) {
-                // Có thể dispatch một action để update drive state
-                // hoặc invalidate drive query cache
-                // Ví dụ với React Query:
-                // queryClient.invalidateQueries(['drive'])
-            }
-
             toast.success('Form saved successfully')
         } catch (err) {
             console.error('Failed to save form:', err)
@@ -96,73 +73,45 @@ export default function FormEditorPage() {
         }
     }
 
-    // Debounced save function - triggers after 10 seconds of inactivity
-    const debouncedSave = useDebouncedCallback(
-        (updates: Partial<Form>) => {
-            saveForm(updates)
-        },
-        2500 // 2,5 seconds
-    )
+    // Debounced save function - triggers after 2.5 seconds of inactivity
+    const debouncedSave = useDebouncedCallback((updates: Partial<Form>) => {
+        saveForm(updates)
+    }, 2500)
 
-    // Handle form updates
-    const handleUpdateForm = useCallback((updates: Partial<Form>) => {
-        // Update local state immediately
-        setForm(prev => prev ? { ...prev, ...updates } : null)
-        // Mark as unsaved
+    // Chỉ cập nhật title
+    const handleTitleChange = useCallback((newTitle: string) => {
+        if (title === newTitle) return
+        setTitle(newTitle)
         setHasUnsavedChanges(true)
-        // Schedule save
-        debouncedSave(updates)
+        debouncedSave({ title: newTitle })
+    }, [title, debouncedSave])
+
+    const handleDescriptionChange = useCallback((newDescription: string) => {
+        if (description === newDescription) return
+        setDescription(newDescription)
+        setHasUnsavedChanges(true)
+        debouncedSave({ description: newDescription })
+    }, [description, debouncedSave])
+
+    // Chỉ cập nhật settings
+    const handleSettingsChange = useCallback((newSettings: FormSettings) => {
+        setSettings(newSettings)
+        setHasUnsavedChanges(true)
+        debouncedSave({ settings: newSettings })
     }, [debouncedSave])
 
-    const handleUpdateSettings = async (settings: Partial<FormSettings>) => {
-        if (!form) return
-        setForm(prev => {
-            if (!prev) return null
-            const newSettings = { ...prev.settings, ...settings }
-
-            const temp = {
-                ...prev,
-                settings: newSettings,
-                isPublic: (settings.isPublished || settings.allowAnonymous) ?? false
-            }
-            return temp
-        })
-
+    // Chỉ cập nhật danh sách câu hỏi
+    const handleQuestionsChange = useCallback((updatedQuestions: Question[]) => {
+        setQuestions(updatedQuestions)
         setHasUnsavedChanges(true)
-        debouncedSave({ settings })
-    }
+        debouncedSave({ questions: updatedQuestions })
+    }, [debouncedSave])
 
-    // Handle manual save
     const handleManualSave = useCallback(async () => {
-        if (!form || !hasUnsavedChanges) return
-
-        // Cancel any pending debounced saves
+        if (!hasUnsavedChanges) return
         debouncedSave.cancel()
-        // Save immediately
-        await saveForm(form)
-    }, [form, hasUnsavedChanges, debouncedSave])
-
-    const handlePublish = async (settings: any) => {
-        try {
-            const response = await axios.post(`/drive/forms/${formId}/publish`, settings)
-            setForm(response.data.form)
-            toast.success('Form published successfully')
-        } catch (error) {
-            toast.error('Failed to publish form')
-            throw error
-        }
-    }
-
-    const handleUnpublish = async () => {
-        try {
-            const response = await axios.post(`/drive/forms/${formId}/unpublish`)
-            setForm(response.data.form)
-            toast.success('Form unpublished')
-        } catch (error) {
-            toast.error('Failed to unpublish form')
-            throw error
-        }
-    }
+        await saveForm({ title, settings, questions })
+    }, [hasUnsavedChanges, title, settings, questions, debouncedSave])
 
     if (loading) {
         return (
@@ -172,10 +121,10 @@ export default function FormEditorPage() {
         )
     }
 
-    if (error || !form) {
+    if (error) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-red-500">{error || 'Form not found'}</div>
+                <div className="text-red-500">{error}</div>
             </div>
         )
     }
@@ -184,38 +133,30 @@ export default function FormEditorPage() {
         <div className="min-h-screen bg-gray-50">
             <FormHeader
                 formId={formId as string}
-                title={form.title}
-                settings={form.settings}
-                onTitleChange={(newTitle) => handleUpdateForm({ title: newTitle })}
+                title={title}
+                settings={settings!}
+                onTitleChange={handleTitleChange}
                 onSave={handleManualSave}
-                onPublish={() => handlePublish(form.settings)}
-                onUpdateSettings={handleUpdateSettings}
-                onUnpublish={handleUnpublish}
+                onUpdateSettings={handleSettingsChange}
                 saving={saving}
                 hasUnsavedChanges={hasUnsavedChanges}
             />
 
             <div className="flex">
-                <main className="flex-1 px-4 py-8 mr-80">
+                <main className="flex-1 px-4 py-8 mr-80 mt-[3.5rem]">
                     <FormEditor
-                        formId={formId as string}
-                        form={form}
-                        onChange={(updatedForm) => handleUpdateForm(updatedForm)}
+                        description={description}
+                        questions={questions}
+                        onDescriptionChange={handleDescriptionChange}
+                        onQuestionsChange={handleQuestionsChange}
                         saving={saving}
                     />
                 </main>
 
                 <FormSidebar
                     formId={formId as string}
-                    settings={form.settings}
-                    // isActive={form.isActive}
-                    // shareId={form.shareId}
-                    // sharedWith={form.sharedWith}
-                    // responses={form.responses}
-                    onSettingsChange={(newSettings) =>
-                        handleUpdateForm({ settings: newSettings })
-                    }
-                    // onActiveChange={(isActive) => handleUpdateForm({ isActive })}
+                    settings={settings!}
+                    onSettingsChange={handleSettingsChange}
                     saving={saving}
                 />
             </div>
@@ -234,4 +175,4 @@ export default function FormEditorPage() {
             )}
         </div>
     )
-} 
+}

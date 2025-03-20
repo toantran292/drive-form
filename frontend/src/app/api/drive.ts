@@ -176,6 +176,7 @@ export async function updateForm(formId: string, data: Partial<Form>): Promise<{
     form: Form;
     driveItem?: DriveItem;
 }> {
+    delete data.responses;
     const response = await axios.patch(`/drive/forms/${formId}`, data);
     return response.data;
 }

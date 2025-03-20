@@ -715,7 +715,6 @@ export class DriveService {
                 // Vẫn tiếp tục update form ngay cả khi không tìm thấy drive item
             }
         }
-
         updateData.settings = {
             ...form.settings,
             ...updateData.settings
@@ -726,6 +725,8 @@ export class DriveService {
         // Cập nhật form
         Object.assign(form, updateData);
         form.modifiedAt = new Date();
+
+        console.log({ form })
 
         return this.formRepository.save(form);
     }
