@@ -22,6 +22,11 @@ interface QuestionEditorProps {
     disabled?: boolean
 }
 
+interface QuestionOption {
+    id: string
+    value: string
+}
+
 const getQuestionTypeLabel = (type: QuestionType): string => {
     switch (type) {
         case QuestionType.TEXT:
@@ -74,20 +79,33 @@ function QuestionEditorComponent({
     )
 
     const handleOptionChange = useCallback(
-        (index: number, value: string) => {
-            const newOptions = [...(question.options || [])]
-            if (newOptions[index] === value) return
-            newOptions[index] = value
+        (optionId: string, value: string) => {
+            const newOptions = question.options?.map(opt =>
+                (opt as QuestionOption).id === optionId
+                    ? { ...(opt as QuestionOption), value }
+                    : opt
+            ) || []
             onChange({ ...question, options: newOptions })
         },
         [question, onChange]
     )
 
     const addOption = useCallback(() => {
+        const newOption: QuestionOption = {
+            id: crypto.randomUUID(),
+            value: ''
+        }
         onChange({
             ...question,
-            options: [...(question.options || []), '']
+            options: [...(question.options || []), newOption]
         })
+    }, [question, onChange])
+
+    const removeOption = useCallback((optionId: string) => {
+        const newOptions = question.options?.filter(opt =>
+            (opt as QuestionOption).id !== optionId
+        ) || []
+        onChange({ ...question, options: newOptions })
     }, [question, onChange])
 
     return (
@@ -140,19 +158,32 @@ function QuestionEditorComponent({
                     {/* Question Type Specific Fields */}
                     {(question.type === QuestionType.MULTIPLE_CHOICE || question.type === QuestionType.SINGLE_CHOICE) && (
                         <div className="space-y-2">
-                            {question.options?.map((option, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                    <span className="text-gray-400">
-                                        {question.type === QuestionType.MULTIPLE_CHOICE ? '○' : '⭕'}
-                                    </span>
-                                    <Input
-                                        defaultValue={option}
-                                        onBlur={(e) => handleOptionChange(index, e.target.value)}
-                                        placeholder={`Option ${index + 1}`}
-                                        disabled={disabled}
-                                    />
-                                </div>
-                            ))}
+                            {question.options?.map((option) => {
+                                const opt = option as QuestionOption
+                                return (
+                                    <div key={opt.id} className="flex items-center gap-2">
+                                        <span className="text-gray-400">
+                                            {question.type === QuestionType.MULTIPLE_CHOICE ? '○' : '⭕'}
+                                        </span>
+                                        <Input
+                                            value={opt.value}
+                                            onChange={(e) => handleOptionChange(opt.id, e.target.value)}
+                                            placeholder="Option text"
+                                            disabled={disabled}
+                                            className="flex-1"
+                                        />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => removeOption(opt.id)}
+                                            disabled={disabled}
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <FiTrash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )
+                            })}
                             <Button
                                 variant="outline"
                                 size="sm"

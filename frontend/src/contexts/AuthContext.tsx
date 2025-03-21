@@ -146,7 +146,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             saveToken(token);
 
             setUser(userData);
-            window.location.href = '/';
         } catch (error) {
             throw error;
         }
@@ -157,7 +156,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const { user: userData, token } = await authApi.register(email, password);
             saveToken(token);
             setUser(userData);
-            window.location.href = '/';
         } catch (error) {
             throw error;
         }

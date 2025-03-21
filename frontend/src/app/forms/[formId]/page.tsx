@@ -22,6 +22,7 @@ export default function FormEditorPage() {
     const [questions, setQuestions] = useState<Question[]>([])
     const [saving, setSaving] = useState(false)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+    const [analytics, setAnalytics] = useState<any>(null)
 
     useEffect(() => {
         async function loadForm() {
@@ -32,6 +33,7 @@ export default function FormEditorPage() {
                 setDescription(formData.description || '')
                 setSettings(formData.settings)
                 setQuestions(formData.questions as Question[])
+                setAnalytics(formData.analytics)
                 setError(null)
             } catch (err) {
                 console.error('Failed to load form:', err)
@@ -143,7 +145,7 @@ export default function FormEditorPage() {
             />
 
             <div className="flex">
-                <main className="flex-1 px-4 py-8 mr-80 mt-[3.5rem]">
+                <main className="flex-1 px-4 py-8 mr-120 mt-[3.5rem]">
                     <FormEditor
                         description={description}
                         questions={questions}
@@ -154,10 +156,11 @@ export default function FormEditorPage() {
                 </main>
 
                 <FormSidebar
-                    formId={formId as string}
+                    analytics={analytics}
                     settings={settings!}
                     onSettingsChange={handleSettingsChange}
                     saving={saving}
+                    questions={questions}
                 />
             </div>
 

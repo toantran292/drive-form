@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { Question, Form } from '@/types/form'
+import { useParams, useRouter, usePathname } from 'next/navigation'
+import { Question, Form, FormSettings } from '@/types/form'
 import { getForm, submitFormResponse } from '@/app/api/drive'
 import { QuestionView } from '@/components/forms/QuestionView'
 import { Button } from '@/components/ui/button'
@@ -10,12 +10,29 @@ import { toast } from 'sonner'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 export default function FormViewPage() {
+    const router = useRouter()
+    const pathname = usePathname()
     const { formId } = useParams()
-    const [form, setForm] = useState<Form | null>(null)
+
+
+    const [title, setTitle] = useState<string | undefined>()
+    const [description, setDescription] = useState<string | undefined>()
+    const [questions, setQuestions] = useState<Question[]>([])
+    const [settings, setSettings] = useState<FormSettings | {}>({
+        theme: {
+            color: '#1a73e8'
+        }
+    })
+
+    const [message, setMessage] = useState('')
+
     const [loading, setLoading] = useState(true)
     const [answers, setAnswers] = useState<Record<string, any>>({})
     const [currentPage, setCurrentPage] = useState(0)
     const [submitting, setSubmitting] = useState(false)
+
+
+
 
     useEffect(() => {
         async function loadForm() {
@@ -23,19 +40,13 @@ export default function FormViewPage() {
                 setLoading(true)
                 const formData = await getForm(formId as string, true)
 
-                // Kiểm tra form có được publish không
-                if (!formData.settings.isPublished) {
-                    toast.error('This form is not available')
-                    return
+                setTitle(formData.title)
+                setDescription(formData.description)
+                setQuestions(formData.questions as Question[] || [])
+                if (formData.settings) {
+                    setSettings(formData.settings)
                 }
-
-                // Kiểm tra form có đang nhận responses không
-                if (!formData.settings.acceptingResponses) {
-                    toast.error('This form is no longer accepting responses')
-                    return
-                }
-
-                setForm(formData)
+                setMessage((formData as any).message || '')
             } catch (err) {
                 toast.error('Failed to load form')
             } finally {
@@ -65,10 +76,8 @@ export default function FormViewPage() {
     }
 
     const handleSubmit = async () => {
-        if (!form) return
-
         // Validate required questions
-        if (!validateAnswers(form.questions)) {
+        if (!validateAnswers(questions)) {
             toast.error('Please answer all required questions')
             return
         }
@@ -81,7 +90,7 @@ export default function FormViewPage() {
                     value
                 }))
             })
-            toast.success(form.settings.confirmationMessage || 'Response submitted successfully')
+            toast.success((settings as any).confirmationMessage || 'Response submitted successfully')
             // Redirect to confirmation page or clear form
         } catch (err) {
             toast.error('Failed to submit response')
@@ -98,49 +107,47 @@ export default function FormViewPage() {
         )
     }
 
-    if (!form) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-red-500">Form not found</div>
-            </div>
-        )
-    }
+    // const questions = form.settings.shuffleQuestions
+    //     ? [...form.questions].sort(() => Math.random() - 0.5)
+    //     : form.questions
 
-    const questions = form.settings.shuffleQuestions
-        ? [...form.questions].sort(() => Math.random() - 0.5)
-        : form.questions
-
-    const questionsPerPage = 5
-    const totalPages = Math.ceil(questions.length / questionsPerPage)
-    const currentQuestions = questions.slice(
-        currentPage * questionsPerPage,
-        (currentPage + 1) * questionsPerPage
-    )
+    // const questionsPerPage = 5
+    // const totalPages = Math.ceil(questions.length / questionsPerPage)
+    // const currentQuestions = questions.slice(
+    //     currentPage * questionsPerPage,
+    //     (currentPage + 1) * questionsPerPage
+    // )
 
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Form Header */}
             <div
                 className="h-2"
-                style={{ backgroundColor: form.settings.theme.color }}
+                style={{ backgroundColor: (settings as any).theme.color }}
             />
 
             <div className="max-w-3xl mx-auto py-8 px-4">
                 {/* Form Title */}
                 <div className="bg-white rounded-lg border p-8 mb-6">
-                    <h1 className="text-3xl font-medium mb-2">{form.title}</h1>
-                    {form.description && (
-                        <p className="text-gray-600">{form.description}</p>
+                    <h1 className="text-3xl font-medium mb-2">{title}</h1>
+                    {description && (
+                        <p className="text-gray-600">{description}</p>
                     )}
-                    {form.settings.collectEmail && (
+                    {(settings as any).collectEmail && (
                         <p className="text-sm text-red-500 mt-4">
                             * This form requires email verification
+                        </p>
+                    )}
+
+                    {message && (
+                        <p className="text-sm text-red-500 mt-4">
+                            {message}
                         </p>
                     )}
                 </div>
 
                 {/* Progress Bar */}
-                {form.settings.showProgressBar && (
+                {/* {(settings as any).showProgressBar && (
                     <div className="mb-6">
                         <div className="h-1 bg-gray-200 rounded-full">
                             <div
@@ -155,51 +162,43 @@ export default function FormViewPage() {
                             Page {currentPage + 1} of {totalPages}
                         </p>
                     </div>
-                )}
+                )} */}
 
                 {/* Questions */}
                 <div className="space-y-6">
-                    {currentQuestions.map((question) => (
+                    {questions.map((question) => (
                         <QuestionView
                             key={question.id}
                             question={question}
                             value={answers[question.id]}
                             onChange={(value) => handleAnswerChange(question.id, value)}
-                            themeColor={form.settings.theme.color}
+                            themeColor={(settings as any).theme.color}
                         />
                     ))}
                 </div>
 
-                {/* Navigation Buttons */}
-                <div className="flex justify-between mt-8">
-                    {currentPage > 0 && (
-                        <Button
-                            onClick={() => setCurrentPage(prev => prev - 1)}
-                            variant="outline"
-                        >
-                            <FiChevronLeft className="mr-2 h-4 w-4" />
-                            Previous
-                        </Button>
-                    )}
+                {message === 'Please sign in to submit this form' ? (<Button
+                    onClick={() => {
+                        const searchParams = new URLSearchParams({
+                            callbackUrl: pathname,
+                        });
+                        router.replace(`/login?${searchParams.toString()}`);
+                    }}
+                    className="ml-auto cursor-pointer mt-4"
+                >
+                    Login to submit
+                </Button>) : null
+                }
 
-                    {currentPage < totalPages - 1 ? (
-                        <Button
-                            onClick={() => setCurrentPage(prev => prev + 1)}
-                            className="ml-auto"
-                        >
-                            Next
-                            <FiChevronRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    ) : (
-                        <Button
-                            onClick={handleSubmit}
-                            disabled={submitting}
-                            className="ml-auto"
-                        >
-                            {submitting ? 'Submitting...' : 'Submit'}
-                        </Button>
-                    )}
-                </div>
+                {!message ? (
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={submitting}
+                        className="ml-auto cursor-pointer mt-4"
+                    >
+                        {submitting ? 'Submitting...' : 'Submit'}
+                    </Button>
+                ) : null}
             </div>
         </div>
     )
