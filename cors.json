@@ -1,7 +1,8 @@
 [
     {
         "origin": [
-            "http://localhost:3000"
+            "http://localhost:3000",
+            "https://ct240.toantran292.net"
         ],
         "method": [
             "GET",

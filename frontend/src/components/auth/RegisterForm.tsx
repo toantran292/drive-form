@@ -27,8 +27,9 @@ export default function RegisterForm() {
             await signUp(email, password);
             toast.success('Account created successfully!');
             router.push('/');
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to create account');
+        } catch (error: unknown) {
+            console.error('Failed to create account:', error)
+            toast.error(error instanceof Error ? error.message : 'Failed to create account');
         } finally {
             setLoading(false);
         }

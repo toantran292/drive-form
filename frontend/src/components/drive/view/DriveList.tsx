@@ -59,7 +59,7 @@ export function DriveList({ items, onFileClick, onDelete, onShare, onDownload, o
                     >
                         {/* Name column */}
                         <div className="flex items-center gap-3">
-                            <FileIcon type={item.type} mimeType={item.mimeType} className="w-5 h-5" />
+                            <FileIcon type={item.type} mimeType={item.mimeType} />
                             <span className="truncate">{item.name}</span>
                         </div>
 

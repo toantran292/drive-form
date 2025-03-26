@@ -46,10 +46,10 @@ export default function LoginForm() {
             const callbackUrl = searchParams?.get('callbackUrl') || '/';
             router.push(callbackUrl);
             router.refresh();
-        } catch (error) {
+        } catch (error: unknown) {
             setError('root', {
                 type: 'manual',
-                message: 'Failed to login. Please check your credentials.'
+                message: error instanceof Error ? error.message : 'Failed to login. Please check your credentials.'
             });
         }
     };

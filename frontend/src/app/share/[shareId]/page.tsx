@@ -26,9 +26,9 @@ export default function SharedFilePage() {
                 setLoading(true);
                 const response = await axios.get<SharedFileResponse>(`/drive/share/${shareId}`);
                 setFileData(response.data);
-            } catch (error: any) {
-                setError('Failed to load shared file');
+            } catch (error: unknown) {
                 console.error('Error loading shared file:', error);
+                setError('Failed to load shared file');
             } finally {
                 setLoading(false);
             }

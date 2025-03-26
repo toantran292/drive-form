@@ -1,6 +1,6 @@
 'use client';
 
-import { FiFileText, FiFolder, FiArrowLeft, FiGrid, FiList, FiUpload } from 'react-icons/fi';
+import { FiFolder, FiGrid, FiList } from 'react-icons/fi';
 import { Button } from "@/components/ui/button";
 import { BackgroundContextMenu } from './context-menu/BackgroundContextMenu';
 import { DriveGrid } from './view/DriveGrid';
@@ -38,6 +38,7 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
     const searchParams = useSearchParams();
     const currentFolderId = searchParams.get('folderId') || undefined;
     const [view, setView] = useState(initialView);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isDragging, setIsDragging] = useState(false);
     const [isFileViewerOpen, setIsFileViewerOpen] = useState(false);
 
@@ -64,6 +65,9 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
         setPreviewData,
         loadFiles,
         shareDialog,
+        currentFile,
+        shareDialogOpen,
+        setShareDialogOpen,
     } = useDrive();
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -306,22 +310,18 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
             )}
 
             {/* Share Dialog */}
-            {shareDialog.currentFile && (
+            {currentFile && (
                 <ShareDialog
-                    fileId={shareDialog.currentFile.id}
-                    fileName={shareDialog.currentFile.name}
-                    open={shareDialog.isOpen}
-                    onOpenChange={shareDialog.handleOpenChange}
+                    fileId={currentFile.id}
+                    fileName={currentFile.name}
+                    open={shareDialogOpen}
+                    onOpenChange={setShareDialogOpen}
                 />
             )}
 
             <CreateFormDialog
                 isOpen={showCreateForm}
                 onClose={() => setShowCreateForm(false)}
-                onSuccess={() => {
-                    loadFiles();
-                    setShowCreateForm(false);
-                }}
             />
             <CreateFolderDialog
                 isOpen={showCreateFolder}

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import * as authApi from '@/app/api/auth';
 import axios from '@/lib/axios';
 import Cookies from 'js-cookie';
-import { useSearchParams, usePathname } from 'next/navigation';
+import {  usePathname } from 'next/navigation';
 
 // Định nghĩa kiểu User cho backend
 interface User {

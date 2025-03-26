@@ -2,11 +2,10 @@
 
 import { Question, QuestionType } from '@/types/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils'
+
 
 interface QuestionOption {
     id: string
@@ -60,7 +59,7 @@ export function QuestionView({
                         className="space-y-2"
                     >
                         {question.options?.map((option) => {
-                            const opt = option as QuestionOption
+                            const opt = option as unknown as QuestionOption
                             return (
                                 <div key={opt.id} className="flex items-center space-x-2">
                                     <RadioGroupItem
@@ -69,7 +68,7 @@ export function QuestionView({
                                         style={{
                                             borderColor: themeColor,
                                             '--theme-color': themeColor
-                                        } as any}
+                                        } as unknown as React.CSSProperties}
                                     />
                                     <Label htmlFor={`${question.id}-${opt.id}`}>
                                         {opt.value}
@@ -83,7 +82,7 @@ export function QuestionView({
                 {question.type === QuestionType.MULTIPLE_CHOICE && (
                     <div className="space-y-2">
                         {question.options?.map((option) => {
-                            const opt = option as QuestionOption
+                            const opt = option as unknown as QuestionOption
                             return (
                                 <div key={opt.id} className="flex items-center space-x-2">
                                     <Checkbox
@@ -104,7 +103,7 @@ export function QuestionView({
                                         style={{
                                             borderColor: themeColor,
                                             '--theme-color': themeColor
-                                        } as any}
+                                        } as unknown as React.CSSProperties}
                                     />
                                     <Label htmlFor={`${question.id}-${opt.id}`}>
                                         {opt.value}

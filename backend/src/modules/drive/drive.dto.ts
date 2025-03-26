@@ -1,10 +1,10 @@
 import { IsString, IsOptional } from 'class-validator';
 
 export class CreateFolderDto {
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
 
-    @IsOptional()
-    @IsString()
-    parentId?: string;
-} 
+  @IsOptional()
+  @IsString()
+  parentId?: string;
+}

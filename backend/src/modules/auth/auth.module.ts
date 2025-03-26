@@ -7,9 +7,9 @@ import { FirebaseAdminService } from '../../shared/services/firebase-admin.servi
 import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User]), SharedModule],
-    providers: [AuthService],
-    controllers: [AuthController],
-    exports: [AuthService],
+  imports: [TypeOrmModule.forFeature([User]), SharedModule],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
 })
-export class AuthModule { } 
+export class AuthModule {}

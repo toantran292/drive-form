@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter, usePathname } from 'next/navigation'
-import { Question, Form, FormSettings } from '@/types/form'
+import { Question, FormSettings } from '@/types/form'
 import { getForm, submitFormResponse } from '@/app/api/drive'
 import { QuestionView } from '@/components/forms/QuestionView'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 export default function FormViewPage() {
     const router = useRouter()
@@ -18,7 +17,7 @@ export default function FormViewPage() {
     const [title, setTitle] = useState<string | undefined>()
     const [description, setDescription] = useState<string | undefined>()
     const [questions, setQuestions] = useState<Question[]>([])
-    const [settings, setSettings] = useState<FormSettings | {}>({
+    const [settings, setSettings] = useState<FormSettings | object>({
         theme: {
             color: '#1a73e8'
         }
@@ -27,11 +26,8 @@ export default function FormViewPage() {
     const [message, setMessage] = useState('')
 
     const [loading, setLoading] = useState(true)
-    const [answers, setAnswers] = useState<Record<string, any>>({})
-    const [currentPage, setCurrentPage] = useState(0)
+    const [answers, setAnswers] = useState<Record<string, unknown>>({})
     const [submitting, setSubmitting] = useState(false)
-
-
 
 
     useEffect(() => {
@@ -46,8 +42,9 @@ export default function FormViewPage() {
                 if (formData.settings) {
                     setSettings(formData.settings)
                 }
-                setMessage((formData as any).message || '')
-            } catch (err) {
+                setMessage((formData as unknown as { message: string }).message || '')
+            } catch (error: unknown) {
+                console.error('Failed to load form:', error)
                 toast.error('Failed to load form')
             } finally {
                 setLoading(false)
@@ -59,7 +56,7 @@ export default function FormViewPage() {
         }
     }, [formId])
 
-    const handleAnswerChange = (questionId: string, value: any) => {
+    const handleAnswerChange = (questionId: string, value: unknown) => {
         setAnswers(prev => ({
             ...prev,
             [questionId]: value
@@ -90,9 +87,10 @@ export default function FormViewPage() {
                     value
                 }))
             })
-            toast.success((settings as any).confirmationMessage || 'Response submitted successfully')
+            toast.success((settings as unknown as { confirmationMessage: string }).confirmationMessage || 'Response submitted successfully')
             // Redirect to confirmation page or clear form
-        } catch (err) {
+        } catch (err: unknown) {
+            console.error('Failed to submit response:', err)
             toast.error('Failed to submit response')
         } finally {
             setSubmitting(false)
@@ -123,7 +121,7 @@ export default function FormViewPage() {
             {/* Form Header */}
             <div
                 className="h-2"
-                style={{ backgroundColor: (settings as any).theme.color }}
+                style={{ backgroundColor: (settings as unknown as { theme: { color: string } }).theme.color }}
             />
 
             <div className="max-w-3xl mx-auto py-8 px-4">
@@ -133,7 +131,7 @@ export default function FormViewPage() {
                     {description && (
                         <p className="text-gray-600">{description}</p>
                     )}
-                    {(settings as any).collectEmail && (
+                    {(settings as unknown as { collectEmail: boolean }).collectEmail && (
                         <p className="text-sm text-red-500 mt-4">
                             * This form requires email verification
                         </p>
@@ -172,7 +170,7 @@ export default function FormViewPage() {
                             question={question}
                             value={answers[question.id]}
                             onChange={(value) => handleAnswerChange(question.id, value)}
-                            themeColor={(settings as any).theme.color}
+                            themeColor={(settings as unknown as { theme: { color: string } }).theme.color}
                         />
                     ))}
                 </div>

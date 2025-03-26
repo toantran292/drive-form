@@ -131,8 +131,8 @@ export async function getProfile() {
     try {
         const response = await axios.get('/auth/me');
         return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Get profile error:', error);
-        throw new Error(error.response?.data?.message || 'Failed to get profile');
+        throw new Error(error instanceof Error ? error.message : 'Failed to get profile');
     }
 } 

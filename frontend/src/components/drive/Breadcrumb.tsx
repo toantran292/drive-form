@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -17,22 +17,22 @@ export function Breadcrumb({ currentFolderId }: BreadcrumbProps) {
     const router = useRouter();
     const [path, setPath] = useState<BreadcrumbItem[]>([]);
 
-    useEffect(() => {
-        if (currentFolderId) {
-            loadPath();
-        } else {
-            setPath([]);
-        }
-    }, [currentFolderId]);
-
-    const loadPath = async () => {
+    const loadPath = useCallback(async () => {
         try {
             const response = await driveApi.getFolderPath(currentFolderId!);
             setPath(response.path);
         } catch (error) {
             console.error('Failed to load path:', error);
         }
-    };
+    }, [currentFolderId]);
+
+    useEffect(() => {
+        if (currentFolderId) {
+            loadPath();
+        } else {
+            setPath([]);
+        }
+    }, [currentFolderId, loadPath]);
 
     return (
         <div className="flex items-center gap-1 text-sm">

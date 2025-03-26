@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FiDownload, FiX, FiZoomIn, FiZoomOut } from 'react-icons/fi';
+import { FiX, FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -9,7 +9,6 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
 interface ShareFileViewerProps {
-    fileId: string;
     mimeType: string;
     name: string;
     onClose: () => void;
@@ -17,7 +16,6 @@ interface ShareFileViewerProps {
 }
 
 export default function ShareFileViewer({
-    fileId,
     mimeType,
     name,
     onClose,
@@ -62,12 +60,12 @@ export default function ShareFileViewer({
                 } else {
                     setPreviewUrl(initialPreviewUrl);
                 }
-            } catch (error: any) {
-                if (error.name === 'AbortError') {
+            } catch (error: unknown) {
+                if (error instanceof Error && error.name === 'AbortError') {
                     return;
                 }
                 console.error('Preview failed:', error);
-                setError(error.message || 'Failed to load preview');
+                setError(error instanceof Error ? error.message : 'Failed to load preview');
             } finally {
                 setIsLoading(false);
             }

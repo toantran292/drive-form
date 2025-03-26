@@ -11,14 +11,14 @@ import { FormResponse } from '../../entities/form.entity';
 import { SharedModule } from '../../shared/shared.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DriveItem, Form, User, FormResponse]),
-        AuthModule,
-        FormModule,
-        SharedModule
-    ],
-    controllers: [DriveController],
-    providers: [DriveService],
-    exports: [DriveService],
+  imports: [
+    TypeOrmModule.forFeature([DriveItem, Form, User, FormResponse]),
+    AuthModule,
+    FormModule,
+    SharedModule,
+  ],
+  controllers: [DriveController],
+  providers: [DriveService],
+  exports: [DriveService],
 })
-export class DriveModule { } 
+export class DriveModule {}

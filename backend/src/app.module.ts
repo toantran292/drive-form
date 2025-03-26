@@ -26,7 +26,7 @@ import { SharedModule } from './shared/shared.module';
         password: configService.get('database.password'),
         database: configService.get('database.database'),
         entities: [User, DriveItem, Form, FormResponse],
-        synchronize: process.env.NODE_ENV === 'development',
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),
@@ -40,4 +40,4 @@ import { SharedModule } from './shared/shared.module';
     SharedModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

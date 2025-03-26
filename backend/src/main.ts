@@ -25,9 +25,10 @@ async function bootstrap() {
 
   // Cấu hình CORS
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production'
-      ? ['https://your-production-domain.com'] // Domain production
-      : ['http://localhost:3000'], // Domain development (Next.js mặc định)
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://ct240.toantran292.net'] // Domain production
+        : ['http://localhost:3000'], // Domain development (Next.js mặc định)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true, // Cho phép gửi cookies
     allowedHeaders: [

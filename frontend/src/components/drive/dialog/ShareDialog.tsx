@@ -43,7 +43,7 @@ export default function ShareDialog({ fileId, fileName, open, onOpenChange }: Sh
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Share "{fileName}"</DialogTitle>
+                    <DialogTitle>Share &quot;{fileName}&quot;</DialogTitle>
                 </DialogHeader>
 
                 <div className="py-4">

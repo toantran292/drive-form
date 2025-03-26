@@ -36,7 +36,6 @@ export function useDriveContent(currentFolderId?: string) {
     const [previewData, setPreviewData] = useState<PreviewData | null>(null);
     const [isPreviewLoading, setIsPreviewLoading] = useState(false);
     const [showCreateFolder, setShowCreateFolder] = useState(false);
-    const [newFolderName, setNewFolderName] = useState('');
     const [isCreatingFolder, setIsCreatingFolder] = useState(false);
     const [uploadingFiles, setUploadingFiles] = useState<{
         [key: string]: {
@@ -79,7 +78,8 @@ export function useDriveContent(currentFolderId?: string) {
                     url: response.url,
                     signedUrl: response.url
                 });
-            } catch (error) {
+            } catch (error: unknown) {
+                console.error('Failed to preview file:', error);
                 toast.error('Failed to preview file');
                 setSelectedFile(null);
             } finally {
@@ -180,7 +180,8 @@ export function useDriveContent(currentFolderId?: string) {
                 setSelectedFile(null);
             }
             toast.success('File deleted successfully');
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Failed to delete file:', error);
             toast.error('Failed to delete file');
         }
     };
@@ -200,7 +201,8 @@ export function useDriveContent(currentFolderId?: string) {
             }
             window.open(data.url, '_blank');
             toast.success('Download started');
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Failed to download file:', error);
             toast.error('Failed to download file');
         }
     };
@@ -282,9 +284,9 @@ export function useDriveContent(currentFolderId?: string) {
                 toast.success("Form created successfully");
                 setShowCreateForm(false);
             } else {
-                throw new Error(response.message || 'Failed to create form');
+                throw new Error((response as unknown as { message: string }).message || 'Failed to create form');
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Create form failed:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to create form');
             throw error;

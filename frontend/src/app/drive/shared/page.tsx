@@ -129,7 +129,8 @@ export default function SharedFilesPage() {
                     fileId={selectedFile.id}
                     mimeType={selectedFile.mimeType || ''}
                     name={selectedFile.name}
-                    onClose={() => setSelectedFile(null)}
+                    open={!!selectedFile}
+                    onOpenChange={() => setSelectedFile(null)}
                 />
             )}
         </div>

@@ -9,14 +9,13 @@ import { Input } from '@/components/ui/input'
 import {
     FiChevronRight,
     FiChevronLeft,
-    FiImage,
     FiBarChart2
 } from 'react-icons/fi'
 import { cn } from '@/lib/utils'
 import { FormSettings } from '@/types/form'
 import { ResponsiveLine } from '@nivo/line'
 import { ResponsiveBar } from '@nivo/bar'
-
+import { Question } from '@/types/form'
 interface FormAnalytics {
     totalResponses: number;
     responsesByDate: { [date: string]: number };
@@ -86,6 +85,7 @@ const ResponseSettings = memo(({ settings, handleSettingChange, saving }: any) =
         </div>
     </div>
 ))
+ResponseSettings.displayName = 'ResponseSettings'
 
 const ThemeSettings = memo(({ settings, handleSettingChange, saving }: any) => (
     <div className="space-y-4">
@@ -126,15 +126,15 @@ const ThemeSettings = memo(({ settings, handleSettingChange, saving }: any) => (
         </div>
     </div>
 ))
-
-const PreviewTab = memo(() => (
-    <div className="space-y-4">
-        <h3 className="font-medium">Form Preview</h3>
-        <div className="aspect-[9/16] rounded-lg border bg-gray-50 flex items-center justify-center">
-            Preview will appear here
-        </div>
-    </div>
-))
+ThemeSettings.displayName = 'ThemeSettings'
+// const PreviewTab = memo(() => (
+//     <div className="space-y-4">
+//         <h3 className="font-medium">Form Preview</h3>
+//         <div className="aspect-[9/16] rounded-lg border bg-gray-50 flex items-center justify-center">
+//             Preview will appear here
+//         </div>
+//     </div>
+// ))
 
 const ResponseStats = memo(({ analytics, questions }: { analytics?: FormAnalytics, questions: Question[] }) => {
     const formatAverageTime = (minutes: number) => {
@@ -260,7 +260,7 @@ const ResponseStats = memo(({ analytics, questions }: { analytics?: FormAnalytic
                             }}
                             tooltip={({ point }) => (
                                 <div className="bg-white px-3 py-2 rounded-lg shadow-lg border text-sm">
-                                    <strong>{point.data.x}</strong>: {point.data.y} responses
+                                    <strong>{String(point.data.x)}</strong>: {String(point.data.y)} responses
                                 </div>
                             )}
                         />
@@ -273,7 +273,8 @@ const ResponseStats = memo(({ analytics, questions }: { analytics?: FormAnalytic
             </div>
 
             {analytics?.questions && Object.entries(analytics.questions)
-                .filter(([questionId, qa]) => Object.keys(qa.options).length > 0)
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                .filter(([_, qa]) => Object.keys(qa.options).length > 0)
                 .map(([questionId, qa]) => {
                     // Tìm question tương ứng để lấy title và options
                     const question = questions.find(q => q.id === questionId);
@@ -282,10 +283,10 @@ const ResponseStats = memo(({ analytics, questions }: { analytics?: FormAnalytic
                     // Map options với label tương ứng
                     const barData = Object.entries(qa.options).map(([optionId, count]) => {
                         const option = question.options?.find(opt =>
-                            typeof opt === 'string' ? opt === optionId : opt.id === optionId
+                            typeof opt === 'string' ? opt === optionId : (opt as { id: string }).id === optionId
                         );
                         return {
-                            option: typeof option === 'string' ? option : option?.value || optionId,
+                            option: typeof option === 'string' ? option : (option as unknown as { value: string }).value || optionId,
                             count: count
                         };
                     });
@@ -369,11 +370,12 @@ const ResponseStats = memo(({ analytics, questions }: { analytics?: FormAnalytic
         </div>
     );
 });
+ResponseStats.displayName = 'ResponseStats'
 
 function FormSidebarComponent({ settings, analytics, questions, onSettingsChange, saving = false }: FormSidebarProps) {
     const [isOpen, setIsOpen] = useState(true)
 
-    const handleSettingChange = (key: keyof FormSettings, value: any) => {
+    const handleSettingChange = (key: keyof FormSettings, value: unknown) => {
         onSettingsChange({
             ...settings,
             [key]: value

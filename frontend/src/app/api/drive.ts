@@ -1,6 +1,6 @@
 import axios from '@/lib/axios';
 import { FormSettings } from '@/types/form';
-import { getStorage, ref, uploadBytes } from 'firebase/storage';
+import { AxiosError } from 'axios';
 
 export interface DriveItem {
     id: string;
@@ -141,7 +141,7 @@ export interface FormResponse {
     submittedAt: Date;
     answers: {
         questionId: string;
-        value: any;
+        value: unknown;
     }[];
 }
 
@@ -263,10 +263,7 @@ export async function createFolder(data: CreateFolderRequest): Promise<CreateFol
         const response = await axios.post<CreateFolderResponse>('/drive/folders', data);
         return response.data;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            throw new Error(error.response?.data?.message || 'Failed to create folder');
-        }
-        throw error;
+        throw new Error(error instanceof Error ? error.message : 'Failed to create folder');
     }
 }
 
@@ -297,7 +294,7 @@ export async function getFolderPath(folderId: string): Promise<GetFolderPathResp
         const response = await axios.get<GetFolderPathResponse>(`/drive/folders/${folderId}/path`);
         return response.data;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
+        if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message || 'Failed to get folder path');
         }
         throw error;

@@ -2,6 +2,7 @@ import * as React from "react"
 import { memo } from "react"
 import { cn } from "@/lib/utils"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(({ className, type, ...props }, ref) => {
   return (
     <input
@@ -17,6 +18,8 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
     />
   )
 })
+
+Input.displayName = 'Input'
 
 const MemoizedInput = memo(Input)
 

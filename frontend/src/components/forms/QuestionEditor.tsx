@@ -81,11 +81,11 @@ function QuestionEditorComponent({
     const handleOptionChange = useCallback(
         (optionId: string, value: string) => {
             const newOptions = question.options?.map(opt =>
-                (opt as QuestionOption).id === optionId
-                    ? { ...(opt as QuestionOption), value }
+                (opt as unknown as QuestionOption).id === optionId
+                    ? { ...(opt as unknown as QuestionOption), value }
                     : opt
             ) || []
-            onChange({ ...question, options: newOptions })
+            onChange({ ...question, options: newOptions as any })
         },
         [question, onChange]
     )
@@ -97,15 +97,15 @@ function QuestionEditorComponent({
         }
         onChange({
             ...question,
-            options: [...(question.options || []), newOption]
+            options: [...(question.options || []) as any, newOption]
         })
     }, [question, onChange])
 
     const removeOption = useCallback((optionId: string) => {
         const newOptions = question.options?.filter(opt =>
-            (opt as QuestionOption).id !== optionId
+            (opt as unknown as QuestionOption).id !== optionId
         ) || []
-        onChange({ ...question, options: newOptions })
+        onChange({ ...question, options: newOptions as any })
     }, [question, onChange])
 
     return (
@@ -159,7 +159,7 @@ function QuestionEditorComponent({
                     {(question.type === QuestionType.MULTIPLE_CHOICE || question.type === QuestionType.SINGLE_CHOICE) && (
                         <div className="space-y-2">
                             {question.options?.map((option) => {
-                                const opt = option as QuestionOption
+                                const opt = option as unknown as QuestionOption
                                 return (
                                     <div key={opt.id} className="flex items-center gap-2">
                                         <span className="text-gray-400">

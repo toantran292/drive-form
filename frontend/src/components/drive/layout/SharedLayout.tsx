@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, ReactNode } from 'react';
-import DriveHeader from './layout/DriveHeader';
-import DriveSidebar from './layout/DriveSidebar';
+import DriveHeader from '../layout/DriveHeader';
+import DriveSidebar from '../layout/DriveSidebar';
 
 interface SharedLayoutProps {
     children: ReactNode | (({ view }: { view: 'grid' | 'list' }) => ReactNode);

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { FiSend, FiLink, FiCopy } from 'react-icons/fi'
+import { FiSend, FiCopy } from 'react-icons/fi'
 import { toast } from 'sonner'
 import { FormSettings } from '@/types/form'
 
@@ -30,7 +30,7 @@ export function PublishFormDialog({
     const [isOpen, setIsOpen] = useState(false)
     const [publishing, setPublishing] = useState(false)
 
-    const handleSettingChange = (key: keyof FormSettings, value: any) => {
+    const handleSettingChange = (key: keyof FormSettings, value: unknown) => {
         onUpdateSettings({
             ...settings,
             [key]: value
@@ -46,7 +46,8 @@ export function PublishFormDialog({
             })
             setIsOpen(false)
             toast.success('Form published successfully')
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Failed to publish form:', error)
             toast.error('Failed to publish form')
         } finally {
             setPublishing(false)
@@ -62,7 +63,8 @@ export function PublishFormDialog({
             })
             setIsOpen(false)
             toast.success('Form unpublished')
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Failed to unpublish form:', error)
             toast.error('Failed to unpublish form')
         } finally {
             setPublishing(false)

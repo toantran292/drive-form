@@ -2,8 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { FiEye, FiSettings, FiSend, FiStar, FiSave, FiCopy } from 'react-icons/fi'
-import { PublishFormDialog } from './PublishFormDialog'
+import { FiSend, FiStar, FiSave, FiCopy } from 'react-icons/fi'
 import { FormSettings } from '@/types/form'
 import { memo, useCallback } from 'react'
 import { toast } from 'sonner'
@@ -44,7 +43,8 @@ function FormHeaderComponent({
         try {
             await navigator.clipboard.writeText(formUrl)
             toast.success('Form URL copied to clipboard')
-        } catch (err) {
+        } catch (error: unknown) {
+            console.error('Failed to copy URL:', error)
             toast.error('Failed to copy URL')
         }
     }, [formUrl])

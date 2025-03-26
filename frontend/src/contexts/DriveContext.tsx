@@ -47,6 +47,8 @@ interface DriveContextType {
     handleAddShareEmail: (fileId: string) => Promise<void>;
     handleRemoveShareEmail: (fileId: string, email: string) => Promise<void>;
     currentFileId: string | null;
+    shareDialog: unknown;
+    currentFile: DriveItem | null;
 }
 
 const DriveContext = createContext<DriveContextType | undefined>(undefined);
@@ -74,6 +76,7 @@ export function DriveProvider({ children, folderId }: { children: ReactNode; fol
         handleAddShareEmail: driveContent.shareDialog.handleAddEmail,
         handleRemoveShareEmail: driveContent.shareDialog.handleRemoveEmail,
         currentFileId: driveContent.shareDialog.currentFile?.id || null,
+        currentFile: driveContent.shareDialog.currentFile as DriveItem | null,
     };
 
     return (
