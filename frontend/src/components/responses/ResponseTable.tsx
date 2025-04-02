@@ -40,7 +40,7 @@ export default function ResponseTable(): JSX.Element {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => router.back()}
-                                className="text-sm text-muted-foreground px-0 hover:bg-transparent"
+                                className="text-sm text-muted-foreground px-0 hover:bg-transparent cursor-pointer"
                             >
                                 ← Quay lại
                             </Button>
@@ -74,7 +74,7 @@ export default function ResponseTable(): JSX.Element {
                                     <TableCell>{record.user?.email || "Không rõ"}</TableCell>
                                     <TableCell>{new Date(record.submittedAt).toLocaleString("vi-VN")}</TableCell>
                                     <TableCell>
-                                        <Button variant="outline" onClick={() => {
+                                        <Button variant="outline" className={"cursor-pointer hover:bg-gray-200"} onClick={() => {
                                             handleViewDetails(record)
                                         }}>
                                             Xem Chi Tiết

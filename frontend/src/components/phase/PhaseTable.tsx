@@ -106,13 +106,13 @@ export default function PhaseTable() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => router.back()}
-                                className="text-sm text-muted-foreground px-0 hover:bg-transparent"
+                                className="text-sm text-muted-foreground px-0 hover:bg-transparent cursor-pointer"
                             >
                                 ← Quay lại
                             </Button>
                             <h1 className="text-xl font-semibold mt-1">Phase</h1>
 
-                        <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={openModal}>
+                        <Button className="cursor-pointer" onClick={openModal}>
                             Phase mới
                         </Button>
                 </header>
@@ -138,20 +138,20 @@ export default function PhaseTable() {
                             </TableRow>
                         ) : (
                             data.map((phase: any) => (
-                                <TableRow key={phase.id} onClick={() => router.push(`phase/${phase.id}/forms`)}>
+                                <TableRow key={phase.id} onClick={() => router.push(`phase/${phase.id}/forms`)} className={"cursor-pointer"}>
                                     <TableCell className="font-medium">{phase.phaseCode}</TableCell>
                                     <TableCell>{phase.name}</TableCell>
-                                    <TableCell>{format(new Date(phase.createdAt), "dd/MM/yyyy - HH:mm", { locale: vi })}</TableCell>
-                                    <TableCell>{format(new Date(phase.updatedAt), "dd/MM/yyyy - HH:mm", { locale: vi })}</TableCell>
+                                    <TableCell>{format(new Date(phase.createdAt), "HH:mm - dd/MM/yyyy", { locale: vi })}</TableCell>
+                                    <TableCell>{format(new Date(phase.updatedAt), "HH:mm - dd/MM/yyyy", { locale: vi })}</TableCell>
                                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
+                                                <Button variant="ghost" size="icon" className={"cursor-pointer hover:bg-gray-200"}>
                                                     <MoreHorizontal className="h-5 w-5" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={() => openShareModal(phase.id)}>Thêm người</DropdownMenuItem>
+                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => openShareModal(phase.id)}>Thêm người</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
@@ -176,8 +176,8 @@ export default function PhaseTable() {
                             <Input id="phaseCode" name="phaseCode" value={newPhase.phaseCode} onChange={handleChange} placeholder="Nhập Phase Code" />
                         </div>
                         <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={closeModal}>Hủy</Button>
-                            <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={addPhase}>Lưu</Button>
+                            <Button variant="outline" onClick={closeModal} className={"cursor-pointer"}>Hủy</Button>
+                            <Button className={"cursor-pointer"} onClick={addPhase}>Lưu</Button>
                         </div>
                     </div>
                 </Modal>
@@ -192,8 +192,8 @@ export default function PhaseTable() {
                             <Input id="shareEmail" type="email" placeholder="example@gmail.com" value={emailToShare} onChange={(e) => setEmailToShare(e.target.value)} />
                         </div>
                         <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={closeShareModal}>Hủy</Button>
-                            <Button className="bg-indigo-600 text-white hover:bg-indigo-700" onClick={handleSharePhase}>Chia sẻ</Button>
+                            <Button variant="outline" onClick={closeShareModal} className={"cursor-pointer"}>Hủy</Button>
+                            <Button className={"cursor-pointer"} onClick={handleSharePhase}>Chia sẻ</Button>
                         </div>
                     </div>
                 </Modal>

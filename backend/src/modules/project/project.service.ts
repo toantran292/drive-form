@@ -58,7 +58,7 @@ export class ProjectService {
       .getMany();
   }
 
-  async getProjectById(id: string) {
+  async getPhaseById(id: string) {
     const project = this.projectRepository.findOne({
       where: { id },
       relations: ['phases'],
@@ -67,16 +67,23 @@ export class ProjectService {
     //return this.projectRepository.findOne({ where: { id }, relations: ['phases'] });
   }
 
-  async updateProject(id: string, updateProjectDto: UpdateProjectDto) {
-    const project = await this.getProjectById(id);
-    if (!project) throw new NotFoundException('Project not found');
+  async getProjectById(projectId: string) {
+    return this.projectRepository.findOne({ where: { id:projectId }, relations: ['phases','sharedWithUsers'] });
+  }
 
+  async updateProject(id: string, updateProjectDto: UpdateProjectDto) {
+    const project = await this.getPhaseById(id);
+    if (!project) throw new NotFoundException('Project not found');
+    if (updateProjectDto.category) {
+      project.category = { id: updateProjectDto.category } as Category;
+      delete updateProjectDto.category;
+    }
     Object.assign(project, updateProjectDto);
     return this.projectRepository.save(project);
   }
 
   async deleteProject(id: string) {
-    const project = await this.getProjectById(id);
+    const project = await this.getPhaseById(id);
     if (!project) throw new NotFoundException('Project not found');
 
     await this.projectRepository.remove(project);
@@ -140,4 +147,41 @@ export class ProjectService {
     project.sharedWithUsers.push(user);
     return this.projectRepository.save(project);
   }
+  async deleteUserFromProject(projectId: string, user: any, userId: string) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['sharedWithUsers', 'creator'],
+    });
+
+    if (!project) throw new NotFoundException('Project not found');
+
+    if (project.creator.uid !== userId) {
+      throw new ConflictException('Người dùng không có quyền xóa người khác khỏi dự án');
+    }
+
+    const userToRemove = await this.userRepository.findOne({
+      where: { uid:user.userId },
+    });
+
+    if (!userToRemove) throw new NotFoundException('User cần xóa không tồn tại');
+
+    project.sharedWithUsers = project.sharedWithUsers.filter(
+        (u) => u.uid !== userToRemove.uid,
+    );
+
+    return this.projectRepository.save(project);
+  }
+
+  async getProjectsShare(user: User) {
+    console.log(user)
+    const foundUser = await this.userRepository.findOne({
+      where: { uid: user.uid },
+      relations: ['sharedProjects', 'sharedProjects.category', 'sharedProjects.creator'],
+    });
+
+    if (!foundUser) throw new NotFoundException('User not found');
+
+    return foundUser.sharedProjects;
+  }
+
 }

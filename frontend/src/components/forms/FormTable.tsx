@@ -21,8 +21,6 @@ export default function FormTable() {
     const params = useParams();
     const [data, setData] = useState<any[]>([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [selectedPhaseId, setSelectedPhaseId] = useState<string | null>(null);
-    const [shareModalOpen, setShareModalOpen] = useState(false);
     const router = useRouter();
     useEffect(() => {
         fetchForms();
@@ -46,13 +44,13 @@ export default function FormTable() {
                         variant="ghost"
                         size="sm"
                         onClick={() => router.back()}
-                        className="text-sm text-muted-foreground px-0 hover:bg-transparent"
+                        className="text-sm text-muted-foreground px-0 hover:bg-transparent cursor-pointer"
                     >
                         ← Quay lại
                     </Button>
                     <h1 className="text-xl font-semibold">Biểu mẫu</h1>
                     <Button
-                        className="bg-blue-600 text-white hover:bg-blue-700"
+                        className="cursor-pointer"
                         size="sm"
                         onClick={() => setShowCreateForm(true)}
                     >
@@ -80,7 +78,7 @@ export default function FormTable() {
                             </TableRow>
                         ) : (
                             data.map((form: any) => (
-                                <TableRow key={form.id} onClick={()=>router.push(`responses/${form.id}`)}>
+                                <TableRow key={form.id} onClick={()=>router.push(`responses/${form.id}`)} className={"cursor-pointer"}>
                                     <TableCell className="font-medium">{form.title}</TableCell>
                                     <TableCell>{form.description || "Không có mô tả"}</TableCell>
                                     <TableCell>
@@ -90,31 +88,29 @@ export default function FormTable() {
                                         {format(new Date(form.modifiedAt), "dd/MM/yyyy - HH:mm", { locale: vi })}
                                     </TableCell>
                                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                                        <DropdownMenu>
+                                        <DropdownMenu >
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
+                                                <Button variant="ghost" size="icon" className={"cursor-pointer"}>
                                                     <MoreHorizontal className="h-5 w-5" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem asChild>
-                                                    <Link href={`responses/${form.id}`}>
-                                                        <span>Truy cập kết quả</span>
-                                                    </Link>
-                                                </DropdownMenuItem>
                                                 <>
                                                 {Array.isArray(form.questions) && form.questions.length > 0 ? (
-                                                    <DropdownMenuItem asChild>
+                                                    <DropdownMenuItem asChild  className={"cursor-pointer"}>
                                                         <Link href={`/forms/${form.id}/view`}>
                                                             <span>Điền biểu mẫu</span>
                                                         </Link>
                                                     </DropdownMenuItem>
                                                 ) : (
-                                                    <DropdownMenuItem disabled>Chưa có câu hỏi</DropdownMenuItem>
+                                                    <DropdownMenuItem disabled className="pointer-events-none opacity-50">
+                                                        Chưa có câu hỏi
+                                                    </DropdownMenuItem>
+
                                                 )}
                                                 </>
 
-                                                <DropdownMenuItem asChild>
+                                                <DropdownMenuItem asChild  className={"cursor-pointer"}>
                                                     <Link href={`/forms/${form.id}`}>
                                                         <span>Chỉnh sửa</span>
                                                     </Link>

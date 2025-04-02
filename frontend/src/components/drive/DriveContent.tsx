@@ -169,24 +169,6 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
                     <h1 className="text-xl font-semibold">Drive</h1>
                     <Breadcrumb currentFolderId={currentFolderId} />
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setView('grid')}
-                        className={view === 'grid' ? 'bg-gray-100' : ''}
-                    >
-                        <FiGrid className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setView('list')}
-                        className={view === 'list' ? 'bg-gray-100' : ''}
-                    >
-                        <FiList className="h-4 w-4" />
-                    </Button>
-                </div>
             </header>
 
             {/* Main Content */}

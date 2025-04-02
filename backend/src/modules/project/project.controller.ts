@@ -32,6 +32,10 @@ export class ProjectController {
   async getAllProjects(@Request() request) {
     return this.projectService.getAllProjects(request.user.uid);
   }
+  @Get("shared")
+  async getProjectsShare(@Request() req) {
+    return this.projectService.getProjectsShare(req.user)
+  }
 
   @Get('category')
   async getCategory() {
@@ -43,6 +47,12 @@ export class ProjectController {
     const project = await this.projectService.getProjectById(id);
     if (!project) throw new NotFoundException('Project not found');
     return project;
+  }
+
+
+  @Get(':id')
+  async getProject(@Param('id') id: string) {
+    return this.projectService.getProjectById(id);
   }
 
   @Patch(':id')
@@ -63,6 +73,19 @@ export class ProjectController {
       id,
       addUserToProjectDto.email,
       req.user.uid,
+    );
+  }
+
+  @Delete(':projectId/remove')
+  async removeUserFromProject(
+      @Param('projectId') projectId: string,
+      @Body() user: string,
+      @Request() req,
+  ) {
+    return this.projectService.deleteUserFromProject(
+        projectId,
+        user,
+        req.user.uid,
     );
   }
 

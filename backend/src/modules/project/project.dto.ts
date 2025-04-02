@@ -21,6 +21,10 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @IsString()
+  projectCode?: string;
+
+  @IsOptional()
+  @IsString()
   category?: string;
 }
 

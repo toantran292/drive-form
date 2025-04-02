@@ -1,6 +1,7 @@
 'use client'
-import ProjectLayout from "@/components/project/layout/ProjectLayout";
+import ShareProjectLayout from "@/components/share-project/layout/ShareProjectLayout";
 
 export default function ProjectShareComponent(){
-    return  <ProjectLayout/>
+    return  <ShareProjectLayout/>
+
 }

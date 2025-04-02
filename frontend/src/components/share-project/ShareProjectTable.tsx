@@ -1,70 +1,75 @@
-"use client"
+"use client";
 
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {Breadcrumb} from "@/components/drive/Breadcrumb";
-import {FiGrid, FiList} from "react-icons/fi";
-import {useSearchParams} from "next/navigation";
+import { useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import axiosInstance from "@/lib/axios";
 
-const data =[
-    {
-        id:1,
-        name:"<UNK>",
-    },
-]
+const PROJECT_SHARED_API_URL = "/projects/shared";
+
 export default function ShareProjectTable() {
-    const searchParams = useSearchParams();
-    const currentFolderId = searchParams.get('folderId') || undefined;
+    const router = useRouter();
+    const [data, setData] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetchSharedProjects();
+    }, []);
+
+    const fetchSharedProjects = async () => {
+        try {
+            const response = await axiosInstance.get(PROJECT_SHARED_API_URL);
+            setData(Array.isArray(response.data) ? response.data : []);
+        } catch {
+            toast.error("Không thể tải danh sách dự án được chia sẻ!");
+        }
+    };
+
     return (
-        <div className="mx-4 space-y-4 w-full h-full">
+        <div className="m-2 w-full h-full">
             <div className="rounded-lg border">
                 <header className="border-b px-6 py-3 flex items-center justify-between bg-white sticky top-0 z-10">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-xl font-semibold">Drive</h1>
-                        <Breadcrumb currentFolderId={currentFolderId} />
-                    </div>
+                    <h1 className="text-xl font-semibold">Dự án được chia sẻ</h1>
                 </header>
+
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Mã</TableHead>
                             <TableHead>Tên</TableHead>
                             <TableHead>Chủ sở hữu</TableHead>
-                            <TableHead className="text-right">Hành động</TableHead>
+                            <TableHead>Loại</TableHead>
+                            <TableHead>Ngày tạo</TableHead>
+                            <TableHead>Cập nhật</TableHead>
+                            <TableHead className="text-right">Xem</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data?.length === 0 ? (
+                        {data.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center h-32 text-muted-foreground">
-                                    Chưa có pages nào
+                                <TableCell colSpan={7} className="text-center h-32 text-muted-foreground">
+                                    Không có dự án nào được chia sẻ
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            data?.map((page: any) => (
-                                <TableRow key={page.id}>
-                                    <TableCell className="font-medium">{page.name}</TableCell>
-                                    <TableCell>
-                                        {page.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {page.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {/*<StatusBadge status={page.status as PageStatus} />*/}
-                                    </TableCell>
+                            data.map((project) => (
+                                <TableRow key={project.id}>
+                                    <TableCell className="font-medium">{project.projectCode}</TableCell>
+                                    <TableCell>{project.name}</TableCell>
+                                    <TableCell>{project.creator?.email || "?"}</TableCell>
+                                    <TableCell>{project.category?.name || "?"}</TableCell>
+                                    <TableCell>{format(new Date(project.createdAt), "HH:mm - dd/MM/yyyy", { locale: vi })}</TableCell>
+                                    <TableCell>{format(new Date(project.updatedAt), "HH:mm - dd/MM/yyyy", { locale: vi })}</TableCell>
                                     <TableCell className="text-right">
-                                        <Link href='/'>
-                                            <Button variant="outline" size="sm" className="cursor-pointer">
-                                                Truy cập
-                                            </Button>
-                                        </Link>
-                                        <Link href='/'>
-                                            <Button variant="outline" size="sm" className="cursor-pointer">
-                                                Chỉnh sửa
-                                            </Button>
-                                        </Link>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => router.push(`/project/${project.id}/phase`)}
+                                        >
+                                            Xem
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -73,5 +78,5 @@ export default function ShareProjectTable() {
                 </Table>
             </div>
         </div>
-    )
+    );
 }
