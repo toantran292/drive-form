@@ -43,23 +43,23 @@ interface FormSidebarProps {
 
 const ResponseSettings = memo(({ settings, handleSettingChange, saving }: any) => (
     <div className="space-y-4">
-        <h3 className="font-medium">Response Settings</h3>
+        <h3 className="font-medium">Cài đặt phản hồi</h3>
         <div className="space-y-4">
             {[{
-                label: "Collect email addresses",
-                description: "Require respondents to sign in",
+                label: "Thu thập địa chỉ email",
+                description: "Yêu cầu người dùng đăng nhập",
                 key: "collectEmail"
             }, {
-                label: "Limit to 1 response",
-                description: "Requires sign in to enforce",
+                label: "Giới hạn 1 phản hồi",
+                description: "Yêu cầu người dùng đăng nhập",
                 key: "limitOneResponsePerUser"
             }, {
-                label: "Show progress bar",
-                description: "Display progress through sections",
+                label: "Hiển thị thanh tiến trình",
+                description: "Hiển thị tiến trình qua từng phần",
                 key: "showProgressBar"
             }, {
-                label: "Shuffle question order",
-                description: "Questions will appear in random order",
+                label: "Xáo trộn thứ tự câu hỏi",
+                description: "Câu hỏi sẽ xuất hiện theo thứ tự ngẫu nhiên",
                 key: "shuffleQuestions"
             }].map(({ label, description, key }) => (
                 <div key={key} className="flex items-center justify-between">

@@ -49,7 +49,7 @@ export function DriveItemContextMenu({
                         className="flex items-center gap-2"
                     >
                         <FiShare2 className="h-4 w-4" />
-                        <span>Share</span>
+                        <span>Chia sẻ</span>
                     </ContextMenuItem>
                 ) : null}
 
@@ -58,7 +58,7 @@ export function DriveItemContextMenu({
                     className="flex items-center gap-2"
                 >
                     <FiEdit className="h-4 w-4" />
-                    <span>Rename</span>
+                    <span>Đổi tên</span>
                 </ContextMenuItem>
 
                 <ContextMenuSeparator />
@@ -68,7 +68,7 @@ export function DriveItemContextMenu({
                     className="flex items-center gap-2 text-red-600 focus:text-red-600"
                 >
                     <FiTrash2 className="h-4 w-4" />
-                    <span>Delete</span>
+                    <span>Xóa</span>
                 </ContextMenuItem>
             </ContextMenuContent>
         </ContextMenu >

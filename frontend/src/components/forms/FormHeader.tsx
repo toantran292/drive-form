@@ -6,6 +6,7 @@ import { FiSend, FiStar, FiSave, FiCopy } from 'react-icons/fi'
 import { FormSettings } from '@/types/form'
 import { memo, useCallback } from 'react'
 import { toast } from 'sonner'
+import {useRouter} from "next/navigation";
 
 interface FormHeaderProps {
     formId: string
@@ -28,6 +29,7 @@ function FormHeaderComponent({
     saving = false,
     hasUnsavedChanges = false
 }: FormHeaderProps) {
+    const router = useRouter();
 
     const handleTogglePublish = useCallback(() => {
         onUpdateSettings({
@@ -42,10 +44,12 @@ function FormHeaderComponent({
     const handleCopyUrl = useCallback(async () => {
         try {
             await navigator.clipboard.writeText(formUrl)
-            toast.success('Form URL copied to clipboard')
+            toast.success('Đã sao chép đường liên kết')
+            // toast.success('Form URL copied to clipboard')
         } catch (error: unknown) {
             console.error('Failed to copy URL:', error)
-            toast.error('Failed to copy URL')
+            toast.error('Sao chép thất bại')
+            // toast.error('Failed to copy URL')
         }
     }, [formUrl])
 
@@ -53,11 +57,14 @@ function FormHeaderComponent({
         <header className="fixed top-0 z-50 border-b bg-white w-full">
             <div className="flex h-14 items-center justify-between px-4">
                 <div className="flex items-center gap-4">
+                    <Button onClick={()=>router.push('/')}>
+                        Quay lại
+                    </Button>
                     <Input
                         defaultValue={title}
                         onBlur={(e) => onTitleChange(e.target.value)}
                         className="h-9 w-64 bg-transparent px-2 text-lg font-medium"
-                        placeholder="Untitled form"
+                        placeholder="Đặt tiêu đề biểu mẫu"
                         disabled={saving}
                     />
                     <Button variant="ghost" size="sm">
@@ -73,7 +80,7 @@ function FormHeaderComponent({
                         disabled={saving || !hasUnsavedChanges}
                     >
                         <FiSave className="h-4 w-4 mr-2" />
-                        {saving ? 'Saving...' : 'Save'}
+                        {saving ? 'Đang lưu...' : 'Đã lưu'}
                     </Button>
                     {settings.isPublished && (
                         <Button
@@ -88,7 +95,7 @@ function FormHeaderComponent({
                     )}
                     <Button variant={settings.isPublished ? "outline" : "default"} onClick={handleTogglePublish}>
                         <FiSend className="mr-2 h-4 w-4" />
-                        {settings.isPublished ? 'Published' : 'Publish'}
+                        {settings.isPublished ? 'Đã xuất bản' : 'Xuất bản'}
                     </Button>
                 </div>
             </div>

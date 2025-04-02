@@ -94,7 +94,7 @@ export function FileList({ files, onFileClick }: { files: FileItemProps['file'][
 
                     {files.length === 0 && (
                         <div className="px-4 py-8 text-center text-sm text-gray-500">
-                            No files found
+                            Hiện không có file
                         </div>
                     )}
                 </div>

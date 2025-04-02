@@ -1,6 +1,6 @@
 'use client'
 
-import { Form, Question, QuestionType } from '@/types/form'
+import { Question, QuestionType } from '@/types/form'
 import { QuestionEditor } from './QuestionEditor'
 import { Button } from '@/components/ui/button'
 import { FiPlus } from 'react-icons/fi'
@@ -24,7 +24,6 @@ function FormEditorComponent({
 }: FormEditorProps) {
     // Dùng useRef để giữ danh sách câu hỏi, tránh tạo lại mảng mới khi không cần thiết
     const questionsRef = useRef(questions)
-
     useMemo(() => {
         questionsRef.current = questions
     }, [questions])
@@ -122,7 +121,7 @@ function FormEditorComponent({
                 disabled={saving}
             >
                 <FiPlus className="mr-2 h-4 w-4" />
-                Add question
+                Thêm câu hỏi
             </Button>
         </div>
     )

@@ -30,11 +30,13 @@ interface QuestionOption {
 const getQuestionTypeLabel = (type: QuestionType): string => {
     switch (type) {
         case QuestionType.TEXT:
-            return 'Short answer'
+            return 'Câu trả lời ngắn'
         case QuestionType.MULTIPLE_CHOICE:
-            return 'Multiple choice'
+            return 'Chọn nhiều'
         case QuestionType.SINGLE_CHOICE:
-            return 'Single choice'
+            return 'Lựa chọn'
+        case QuestionType.FILE_CHOICE:
+            return 'Chọn file'
         default:
             return type
     }
@@ -44,6 +46,7 @@ const questionTypeIcons = {
     [QuestionType.TEXT]: '✏️',
     [QuestionType.MULTIPLE_CHOICE]: '⭕',
     [QuestionType.SINGLE_CHOICE]: '⭕',
+    [QuestionType.FILE_CHOICE]: '',
 }
 
 function QuestionEditorComponent({
@@ -116,7 +119,7 @@ function QuestionEditorComponent({
                     <Input
                         defaultValue={question.title}
                         onBlur={handleTitleChange}
-                        placeholder="Question"
+                        placeholder="Câu hỏi"
                         className="text-lg"
                         disabled={disabled}
                     />
@@ -139,7 +142,7 @@ function QuestionEditorComponent({
                         disabled={disabled}
                     >
                         <SelectTrigger className="w-[200px]">
-                            <SelectValue placeholder="Select question type" />
+                            <SelectValue placeholder="Chọn loại câu hỏi" />
                         </SelectTrigger>
                         <SelectContent>
                             {Object.values(QuestionType).map((type) => (
@@ -191,8 +194,23 @@ function QuestionEditorComponent({
                                 disabled={disabled}
                                 className="mt-2"
                             >
-                                Add option
+                                Thêm lựa chọn
                             </Button>
+                        </div>
+                    )}
+                    {question.type === QuestionType.FILE_CHOICE && (
+                        <div className="space-y-2">
+                            <Input
+                                type="file"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        onChange({ ...question, file });
+                                    }
+                                }}
+                                disabled={disabled}
+                                className="flex-1"
+                            />
                         </div>
                     )}
                 </div>
@@ -205,7 +223,7 @@ function QuestionEditorComponent({
                         onClick={onDelete}
                         disabled={disabled}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Delete question"
+                        title="Xóa câu hỏi"
                     >
                         <FiTrash2 className="h-4 w-4" />
                     </Button>
@@ -215,7 +233,7 @@ function QuestionEditorComponent({
                         onClick={onDuplicate}
                         disabled={disabled}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Duplicate question"
+                        title="Nhân bản câu hỏi"
                     >
                         <FiCopy className="h-4 w-4" />
                     </Button>
@@ -227,7 +245,7 @@ function QuestionEditorComponent({
                             }
                             disabled={disabled}
                         />
-                        <span className="text-sm">Required</span>
+                        <span className="text-sm">Bắt buộc</span>
                     </div>
                 </div>
             </div>

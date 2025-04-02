@@ -90,10 +90,12 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
                 for (const file of e.dataTransfer.files) {
                     await handleUpload(file);
                 }
-                toast.success('Files uploaded successfully');
+                toast.success('Tải tệp thành công');
+                // toast.success('Files uploaded successfully');
                 loadFiles();
             } catch (error) {
-                toast.error('Failed to upload files');
+                toast.error('Tải tệp thất bại');
+                // toast.error('Failed to upload files');
             }
             return;
         }
@@ -109,10 +111,10 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
             }
 
             await handleMoveItem(item.id, targetFolderId);
-            toast.success(`Moved ${item.name} successfully`);
+            toast.success(`Di chuyển ${item.name} thành công`);
             loadFiles();
         } catch (error) {
-            toast.error('Failed to move item');
+            toast.error('Di chuyển thất bại');
         }
     }, [currentFolderId, handleMoveItem, handleUpload, loadFiles]);
 
@@ -223,7 +225,7 @@ export default function DriveContent({ view: initialView }: DriveContentProps) {
                         {items.length === 0 ? (
                             <div className="text-center text-gray-500 mt-20">
                                 <FiFolder className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                                <p>No files or folders yet. Upload something!</p>
+                                <p>Chưa có tệp hoặc thư mục. Tải lên một cái gì đó!</p>
                             </div>
                         ) : view === 'grid' ? (
                             <div className="space-y-8">

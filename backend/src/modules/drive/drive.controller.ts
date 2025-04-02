@@ -372,13 +372,14 @@ export class DriveController {
         id: form.id,
         title: form.title,
         description: form.description,
+        phaseId: form.phaseId,
         questions: form.questions || [],
         settings: form.settings || {
           collectEmail: false,
           limitToOneResponse: false,
           showProgressBar: true,
           shuffleQuestions: false,
-          confirmationMessage: 'Your response has been recorded.',
+          confirmationMessage: 'Phản hồi của bạn đã được gửi.',
           theme: {
             color: '#1a73e8',
             font: 'Default',
@@ -395,6 +396,7 @@ export class DriveController {
         responseCount: form.responseCount ?? 0,
         responses: form.responses || [],
         analytics: form.analytics || {},
+        phase: form.phase || { id: 'default-phase-id', name: 'Default' },
       };
     } catch (error) {
       throw new BadRequestException(`Failed to get form: ${error.message}`);

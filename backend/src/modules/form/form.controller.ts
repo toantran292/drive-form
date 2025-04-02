@@ -93,4 +93,16 @@ export class FormController {
     }
     return this.formService.getFormResponses(id, req.user.uid);
   }
+
+  @Get(':id/responses/:responseId') // ✅ đúng chính tả
+  async getFormResponseById(
+    @Req() req,
+    @Param('id') id: string,
+    @Param('responseId') responseId: string,
+  ) {
+    if (!req.user) {
+      throw new Error('User not found');
+    }
+    return this.formService.getFormResponseById(responseId, req.user.uid); // ✅ truyền đúng tham số
+  }
 }

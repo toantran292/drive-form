@@ -10,6 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { FirebaseAdminService } from '../../shared/services/firebase-admin.service';
+import * as process from 'node:process';
 
 @Controller('auth')
 export class AuthController {
@@ -66,6 +67,7 @@ export class AuthController {
           emailVerified: userRecord.emailVerified,
           displayName: userRecord.displayName,
           photoURL: userRecord.photoURL,
+          isAdmin: userRecord.email === process.env.ADMIN_EMAIL,
         },
       };
     } catch (error) {
@@ -88,6 +90,7 @@ export class AuthController {
       }
 
       const decodedToken = await this.firebaseAdmin.verifyToken(token);
+      decodedToken.is_admin = process.env.ADMIN_EMAIL === decodedToken.email;
       return { decodedToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid token');

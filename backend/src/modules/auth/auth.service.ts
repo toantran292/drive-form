@@ -26,20 +26,6 @@ export class AuthService {
     private readonly firebaseAdmin: FirebaseAdminService,
   ) {}
 
-  // onModuleInit() {
-  //     // Initialize Firebase Admin
-  //     const firebaseConfig = this.configService.get('firebase');
-  //     if (!admin.apps.length) {
-  //         admin.initializeApp({
-  //             credential: admin.credential.cert({
-  //                 projectId: firebaseConfig.projectId,
-  //                 privateKey: firebaseConfig.privateKey,
-  //                 clientEmail: firebaseConfig.clientEmail,
-  //             }),
-  //         });
-  //     }
-  // }
-
   async createUser(userData: CreateUserDto): Promise<User> {
     const user = this.userRepository.create(userData);
     return this.userRepository.save(user);
@@ -69,7 +55,6 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      console.error('Token validation error in service:', error); // Debug log
       throw new UnauthorizedException('Invalid token');
     }
   }

@@ -11,11 +11,11 @@ import { z } from 'zod';
 // Định nghĩa schema validation
 const loginSchema = z.object({
     email: z.string()
-        .email('Please enter a valid email address')
-        .min(1, 'Email is required'),
+        .email('Vui lòng nhập đúng định dạng email')
+        .min(1, 'Email là bắt buộc'),
     password: z.string()
-        .min(6, 'Password must be at least 6 characters')
-        .max(50, 'Password is too long')
+        .min(6, 'Mật khẩu phải ít nhất là 6 ký tự')
+        .max(50, 'Mật khẩu quá dài')
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -29,7 +29,6 @@ export default function LoginForm() {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-        setError
     } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -41,16 +40,13 @@ export default function LoginForm() {
     const onSubmit = async (data: LoginFormData) => {
         try {
             await signIn(data.email, data.password);
-            toast.success('Login successful!');
 
             const callbackUrl = searchParams?.get('callbackUrl') || '/';
+            toast.success("Đăng nhập thành công.")
             router.push(callbackUrl);
             router.refresh();
         } catch (error: unknown) {
-            setError('root', {
-                type: 'manual',
-                message: error instanceof Error ? error.message : 'Failed to login. Please check your credentials.'
-            });
+            toast.error('Sai tài khoản hoặc mật khẩu');
         }
     };
 
@@ -58,11 +54,6 @@ export default function LoginForm() {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
             <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    {errors.root && (
-                        <div className="bg-red-50 border border-red-200 text-red-600 rounded-md p-4 text-sm">
-                            {errors.root.message}
-                        </div>
-                    )}
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">

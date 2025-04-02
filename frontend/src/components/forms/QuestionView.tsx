@@ -58,6 +58,7 @@ export function QuestionView({
                         onValueChange={onChange}
                         className="space-y-2"
                     >
+                        <>
                         {question.options?.map((option) => {
                             const opt = option as unknown as QuestionOption
                             return (
@@ -76,6 +77,7 @@ export function QuestionView({
                                 </div>
                             )
                         })}
+                        </>
                     </RadioGroup>
                 )}
 

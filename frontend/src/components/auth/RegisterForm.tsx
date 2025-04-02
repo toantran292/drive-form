@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import toast from 'react-hot-toast';
+import {toast} from "sonner";
 
 export default function RegisterForm() {
     const [email, setEmail] = useState('');
@@ -18,18 +18,21 @@ export default function RegisterForm() {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error('Mật khẩu không trùng khớp');
             return;
         }
 
         try {
             setLoading(true);
             await signUp(email, password);
-            toast.success('Account created successfully!');
+            toast.success('Tạo tài khoản thành công!');
             router.push('/');
-        } catch (error: unknown) {
-            console.error('Failed to create account:', error)
-            toast.error(error instanceof Error ? error.message : 'Failed to create account');
+        } catch (error: any)  {
+            if(error?.code === "auth/email-already-in-use") {
+                toast.error("Email đã được được sử dụng");
+            } else {
+                toast.error(error instanceof Error ? error.message : 'Failed to create account');
+            }
         } finally {
             setLoading(false);
         }

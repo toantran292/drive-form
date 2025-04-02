@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { Form } from './form.entity';
+import { Project } from './project.entity';
 
 @Entity('users')
 export class User {
@@ -30,4 +32,7 @@ export class User {
 
   @OneToMany(() => Form, (form) => form.owner)
   forms: Form[];
+
+  @ManyToMany(() => Project, (project) => project.sharedWithUsers)
+  sharedProjects: Project[];
 }

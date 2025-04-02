@@ -5,6 +5,7 @@ import * as authApi from '@/app/api/auth';
 import axios from '@/lib/axios';
 import Cookies from 'js-cookie';
 import {  usePathname } from 'next/navigation';
+import {toast} from "sonner";
 
 // Định nghĩa kiểu User cho backend
 interface User {
@@ -12,6 +13,7 @@ interface User {
     email: string;
     displayName?: string;
     photoURL?: string;
+    isAdmin: boolean;
 }
 
 interface AuthContextType {
@@ -101,7 +103,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         uid: decodedToken.uid,
                         email: decodedToken.email || '',
                         displayName: decodedToken.name,
-                        photoURL: decodedToken.picture
+                        photoURL: decodedToken.picture,
+                        isAdmin: decodedToken.is_admin||false
                     });
                 }
             } catch (error) {
