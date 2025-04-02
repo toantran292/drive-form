@@ -1,27 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {useParams, useRouter} from "next/navigation";
-import Link from "next/link";
-import axiosInstance from "@/lib/axios";
-import { CreateFormDialog } from "@/components/drive/dialog/CreateFormDialog";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {MoreHorizontal} from "lucide-react";
-import axios from "@/lib/axios";
-import {Form} from "@/types/form";
+
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+import { CreateFormDialog } from "@/components/drive/dialog/CreateFormDialog";
+import { CustomTable, Column } from "@/components/CustomTable";
+import axiosInstance from "@/lib/axios";
 
 export default function FormTable() {
     const params = useParams();
+    const router = useRouter();
     const [data, setData] = useState<any[]>([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const router = useRouter();
+
     useEffect(() => {
         fetchForms();
     }, [params.phaseId]);
@@ -35,6 +33,51 @@ export default function FormTable() {
             toast.error("Không thể tải danh sách biểu mẫu!");
         }
     };
+
+    const columns: Column<any>[] = [
+        {
+            header: "Tiêu đề",
+            render: (form) => form.title,
+        },
+        {
+            header: "Mô tả",
+            render: (form) => form.description || "Không có mô tả",
+        },
+        {
+            header: "Ngày tạo",
+            render: (form) => format(new Date(form.createdAt), "dd/MM/yyyy - HH:mm", { locale: vi }),
+        },
+        {
+            header: "Cập nhật",
+            render: (form) => format(new Date(form.modifiedAt), "dd/MM/yyyy - HH:mm", { locale: vi }),
+        },
+        {
+            header: "Hành động",
+            render: (form) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="cursor-pointer hover:bg-gray-200">
+                            <MoreHorizontal className="h-5 w-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {Array.isArray(form.questions) && form.questions.length > 0 ? (
+                            <DropdownMenuItem asChild className="cursor-pointer" onClick={e => e.stopPropagation()}>
+                                <Link href={`/forms/${form.id}/view`}><span>Điền biểu mẫu</span></Link>
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem disabled className="pointer-events-none opacity-50">
+                                Chưa có câu hỏi
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem asChild className="cursor-pointer" onClick={e => e.stopPropagation()}>
+                            <Link href={`/forms/${form.id}`}><span>Chỉnh sửa</span></Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
+        },
+    ];
 
     return (
         <div className="m-2 space-y-4 w-full h-full">
@@ -58,75 +101,14 @@ export default function FormTable() {
                     </Button>
                 </header>
 
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Tiêu đề</TableHead>
-                            <TableHead>Mô tả</TableHead>
-                            <TableHead>Ngày tạo</TableHead>
-                            <TableHead>Cập nhật</TableHead>
-                            <TableHead className="text-right">Hành động</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <>
-                        {data?.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} className="text-center h-32 text-muted-foreground">
-                                    Chưa có biểu mẫu nào
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            data.map((form: any) => (
-                                <TableRow key={form.id} onClick={()=>router.push(`responses/${form.id}`)} className={"cursor-pointer"}>
-                                    <TableCell className="font-medium">{form.title}</TableCell>
-                                    <TableCell>{form.description || "Không có mô tả"}</TableCell>
-                                    <TableCell>
-                                        {format(new Date(form.createdAt), "dd/MM/yyyy - HH:mm", { locale: vi })}
-                                    </TableCell>
-                                    <TableCell>
-                                        {format(new Date(form.modifiedAt), "dd/MM/yyyy - HH:mm", { locale: vi })}
-                                    </TableCell>
-                                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                                        <DropdownMenu >
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className={"cursor-pointer"}>
-                                                    <MoreHorizontal className="h-5 w-5" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <>
-                                                {Array.isArray(form.questions) && form.questions.length > 0 ? (
-                                                    <DropdownMenuItem asChild  className={"cursor-pointer"}>
-                                                        <Link href={`/forms/${form.id}/view`}>
-                                                            <span>Điền biểu mẫu</span>
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                ) : (
-                                                    <DropdownMenuItem disabled className="pointer-events-none opacity-50">
-                                                        Chưa có câu hỏi
-                                                    </DropdownMenuItem>
-
-                                                )}
-                                                </>
-
-                                                <DropdownMenuItem asChild  className={"cursor-pointer"}>
-                                                    <Link href={`/forms/${form.id}`}>
-                                                        <span>Chỉnh sửa</span>
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                        </>
-                    </TableBody>
-                </Table>
+                <CustomTable
+                    data={data}
+                    columns={columns}
+                    emptyMessage="Chưa có biểu mẫu nào"
+                    onRowClick={(form) => router.push(`responses/${form.id}`)}
+                />
             </div>
 
-            {/* Dialog tạo form */}
             <CreateFormDialog
                 phaseId={params.phaseId}
                 isOpen={showCreateForm}
@@ -135,7 +117,6 @@ export default function FormTable() {
         </div>
     );
 }
-
 export const getFormByPhase = async (formId: string): Promise<Form> => {
     const response = await axios.get(`phases/forms/${formId}`)
     return response.data

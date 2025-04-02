@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import { Modal } from "@/components/Modal";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import axiosInstance from "@/lib/axios";
+import { CustomTable, Column } from "@/components/CustomTable";
 
 const PROJECT_API_URL = "/projects";
 
@@ -68,6 +68,34 @@ export default function ManageUsersProjectTable() {
         }
     };
 
+    const columns: Column<any>[] = [
+        {
+            header: "Email",
+            render: (user) => user.email,
+        },
+        {
+            header: "Tên",
+            render: (user) => user.displayName || "User",
+        },
+        {
+            header: "Hành động",
+            render: (user) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="cursor-pointer hover:bg-gray-200">
+                            <MoreHorizontal className="h-5 w-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => handleRemoveUser(user.uid)}>
+                            Xóa khỏi dự án
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
+        },
+    ];
+
     return (
         <div className="m-2 w-full h-full">
             <div className="rounded-lg border">
@@ -90,46 +118,11 @@ export default function ManageUsersProjectTable() {
                         Thêm người mới
                     </Button>
                 </header>
-
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Tên</TableHead>
-                            <TableHead className="text-right">Hành động</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {project?.sharedWithUsers?.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={3} className="text-center h-32 text-muted-foreground">
-                                    Chưa có người dùng chia sẻ
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            project?.sharedWithUsers.map((user: any) => (
-                                <TableRow key={user.uid} className={"cursor-pointer"}>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.displayName || "User"}</TableCell>
-                                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className={"cursor-pointer hover:bg-gray-200"}>
-                                                    <MoreHorizontal className="h-5 w-5" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem className={"cursor-pointer"} onClick={() => handleRemoveUser(user.uid)}>
-                                                    Xóa khỏi dự án
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                <CustomTable
+                    data={project?.sharedWithUsers || []}
+                    columns={columns}
+                    emptyMessage="Chưa có người dùng chia sẻ"
+                />
             </div>
 
             {shareModalOpen && (
@@ -146,8 +139,8 @@ export default function ManageUsersProjectTable() {
                             />
                         </div>
                         <div className="flex justify-end space-x-2">
-                            <Button variant="outline" className={"cursor-pointer"} onClick={() => setShareModalOpen(false)}>Hủy</Button>
-                            <Button className={"cursor-pointer"} onClick={handleShareProject}>Chia sẻ</Button>
+                            <Button variant="outline" className="cursor-pointer" onClick={() => setShareModalOpen(false)}>Hủy</Button>
+                            <Button className="cursor-pointer" onClick={handleShareProject}>Chia sẻ</Button>
                         </div>
                     </div>
                 </Modal>
