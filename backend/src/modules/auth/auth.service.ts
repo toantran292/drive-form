@@ -1,11 +1,9 @@
 import {
   Injectable,
-  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as admin from 'firebase-admin';
 import { User } from '../../entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { FirebaseAdminService } from '../../shared/services/firebase-admin.service';
