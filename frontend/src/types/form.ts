@@ -3,6 +3,7 @@ export enum QuestionType {
     SINGLE_CHOICE = 'single_choice',
     MULTIPLE_CHOICE = 'multiple_choice',
     // CHECKBOX = 'checkbox',
+    FILE_CHOICE = 'file_choice',
 }
 
 export interface Question {

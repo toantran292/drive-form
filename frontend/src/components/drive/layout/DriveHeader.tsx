@@ -18,7 +18,7 @@ export default function DriveHeader({ onViewChange }: DriveHeaderProps) {
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Search in Drive"
+                            placeholder="Tìm kiếm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="text-gray-900 w-full px-4 py-2 pl-10 bg-gray-100 rounded-lg focus:outline-none focus:ring-2"
@@ -29,18 +29,18 @@ export default function DriveHeader({ onViewChange }: DriveHeaderProps) {
             </div>
 
             <div className="flex items-center space-x-4">
-                <button
-                    onClick={() => onViewChange('grid')}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                    <FiGrid size={20} />
-                </button>
-                <button
-                    onClick={() => onViewChange('list')}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                    <FiList size={20} />
-                </button>
+                {/*<button*/}
+                {/*    onClick={() => onViewChange('grid')}*/}
+                {/*    className="p-2 hover:bg-gray-100 rounded-full"*/}
+                {/*>*/}
+                {/*    <FiGrid size={20} />*/}
+                {/*</button>*/}
+                {/*<button*/}
+                {/*    onClick={() => onViewChange('list')}*/}
+                {/*    className="p-2 hover:bg-gray-100 rounded-full"*/}
+                {/*>*/}
+                {/*    <FiList size={20} />*/}
+                {/*</button>*/}
                 <button className="p-2 hover:bg-gray-100 rounded-full">
                     <FiSettings size={20} />
                 </button>

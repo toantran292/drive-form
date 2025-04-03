@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Form, FormResponse } from '../../entities/form.entity';
 import { CreateFormDto, UpdateFormDto } from './form.dto';
+import { Phase } from '../../entities/phase.entity';
 
 @Injectable()
 export class FormService {
@@ -15,6 +16,9 @@ export class FormService {
     private formRepository: Repository<Form>,
     @InjectRepository(FormResponse)
     private formResponseRepository: Repository<FormResponse>,
+
+    @InjectRepository(Phase)
+    private phaseRepository: Repository<Phase>,
   ) {}
 
   async createForm(userId: string, createFormDto: CreateFormDto) {
@@ -35,6 +39,7 @@ export class FormService {
   async getForm(id: string, userId?: string) {
     const form = await this.formRepository.findOne({
       where: { id },
+      relations: ['respondent'],
     });
 
     if (!form) {
@@ -154,7 +159,30 @@ export class FormService {
 
     return this.formResponseRepository.find({
       where: { formId: id },
+      relations: ['user', 'form'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async getFormResponseById(responseId: string, userId: string) {
+    const response = await this.formResponseRepository.findOne({
+      where: { id: responseId },
+      relations: ['form'],
+    });
+
+    if (!response) {
+      throw new NotFoundException('Không tìm thấy phản hồi');
+    }
+
+    const form = response.form;
+
+    const isOwner = form.ownerId === userId;
+    const isShared = form.sharedWith?.some((share) => share.userId === userId);
+
+    if (!isOwner && !isShared) {
+      throw new ForbiddenException('Bạn không có quyền xem phản hồi này');
+    }
+
+    return response;
   }
 }

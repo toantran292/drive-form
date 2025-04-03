@@ -34,12 +34,12 @@ export function CreateFolderDialog({
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create New Folder</DialogTitle>
+                    <DialogTitle>Tạo thư mục mới</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="py-4">
                         <Input
-                            placeholder="Enter folder name"
+                            placeholder="Nhập tên thư mục"
                             value={folderName}
                             onChange={(e) => setFolderName(e.target.value)}
                             autoFocus
@@ -52,14 +52,14 @@ export function CreateFolderDialog({
                             onClick={onClose}
                             disabled={isLoading}
                         >
-                            Cancel
+                            Đóng
                         </Button>
                         <Button
                             type="submit"
                             disabled={!folderName.trim() || isLoading}
                             loading={isLoading}
                         >
-                            Create
+                            Tạo
                         </Button>
                     </DialogFooter>
                 </form>

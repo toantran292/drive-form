@@ -88,7 +88,6 @@ export async function login(email: string, password: string): Promise<AuthRespon
             token: idToken
         };
     } catch (error) {
-        console.error('Login error:', error);
         throw error;
     }
 }

@@ -9,6 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Phase } from './phase.entity';
 
 export enum QuestionType {
   TEXT = 'text',
@@ -92,7 +93,7 @@ export class Form {
       limitOneResponsePerUser: false,
       showProgressBar: true,
       shuffleQuestions: false,
-      confirmationMessage: 'Your response has been recorded.',
+      confirmationMessage: 'Phản hồi của bạn đã được gửi.',
       isPublished: false,
       allowAnonymous: false,
       acceptingResponses: true,
@@ -106,6 +107,16 @@ export class Form {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'owner_id' })
   owner: User;
+
+  @Column({ name: 'phase_id', nullable: true })
+  phaseId: string;
+
+  @ManyToOne(() => Phase, (phase) => phase.forms, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'phase_id' })
+  phase: Phase;
 
   @CreateDateColumn()
   createdAt: Date;

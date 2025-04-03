@@ -45,10 +45,12 @@ export function PublishFormDialog({
                 publishedAt: new Date()
             })
             setIsOpen(false)
-            toast.success('Form published successfully')
+            toast.success('Xuất bản biểu mẫu thành công')
+            // toast.success('Form published successfully')
         } catch (error: unknown) {
             console.error('Failed to publish form:', error)
-            toast.error('Failed to publish form')
+            // toast.error('Failed to publish form')
+            toast.error('Xuất bản biểu mẫu thất bại')
         } finally {
             setPublishing(false)
         }
@@ -92,7 +94,7 @@ export function PublishFormDialog({
                     {settings.isPublished ? (
                         <>
                             <div className="space-y-4">
-                                <Label>Share Link</Label>
+                                <Label>Chia sẻ đường liên kết</Label>
                                 <div className="flex items-center gap-2">
                                     <Input
                                         readOnly

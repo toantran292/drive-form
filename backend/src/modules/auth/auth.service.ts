@@ -1,11 +1,9 @@
 import {
   Injectable,
-  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as admin from 'firebase-admin';
 import { User } from '../../entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { FirebaseAdminService } from '../../shared/services/firebase-admin.service';
@@ -25,20 +23,6 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly firebaseAdmin: FirebaseAdminService,
   ) {}
-
-  // onModuleInit() {
-  //     // Initialize Firebase Admin
-  //     const firebaseConfig = this.configService.get('firebase');
-  //     if (!admin.apps.length) {
-  //         admin.initializeApp({
-  //             credential: admin.credential.cert({
-  //                 projectId: firebaseConfig.projectId,
-  //                 privateKey: firebaseConfig.privateKey,
-  //                 clientEmail: firebaseConfig.clientEmail,
-  //             }),
-  //         });
-  //     }
-  // }
 
   async createUser(userData: CreateUserDto): Promise<User> {
     const user = this.userRepository.create(userData);
@@ -69,7 +53,6 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      console.error('Token validation error in service:', error); // Debug log
       throw new UnauthorizedException('Invalid token');
     }
   }

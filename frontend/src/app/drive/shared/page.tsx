@@ -44,11 +44,12 @@ export default function SharedFilesPage() {
                 </div>
             )}
 
-            <h1 className="text-2xl font-semibold mb-6">Shared with me</h1>
+            <h1 className="text-2xl font-semibold mb-6">Chia sẻ với tôi</h1>
 
             {files.length === 0 ? (
                 <div className="text-center text-gray-500 mt-8">
                     No files have been shared with you yet.
+
                 </div>
             ) : view === 'grid' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -86,7 +87,7 @@ export default function SharedFilesPage() {
                 <table className="w-full">
                     <thead>
                         <tr className="text-left border-b">
-                            <th className="pb-3 pl-4">Name</th>
+                            <th className="pb-3 pl-4">Tên</th>
                             <th className="pb-3">Modified</th>
                             <th className="pb-3">Size</th>
                             <th className="pb-3">Owner</th>

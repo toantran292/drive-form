@@ -86,9 +86,9 @@ export function DriveGrid({
                                 </div>
                                 <div className="text-sm text-gray-500 text-center">
                                     {item.type === 'folder' ? (
-                                        'Folder'
+                                        'Thư mục'
                                     ) : item.type === 'form' ? (
-                                        'Form'
+                                        'Biểu mẫu'
                                     ) : (
                                         item.size && formatFileSize(item.size)
                                     )}

@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
 export default function FormViewPage() {
-    const router = useRouter()
     const pathname = usePathname()
+    const router = useRouter()
     const { formId } = useParams()
 
 
@@ -91,7 +91,8 @@ export default function FormViewPage() {
             // Redirect to confirmation page or clear form
         } catch (err: unknown) {
             console.error('Failed to submit response:', err)
-            toast.error('Failed to submit response')
+            toast.error('Gửi phản hồi thất bại')
+            // toast.error('Failed to submit response')
         } finally {
             setSubmitting(false)
         }

@@ -9,6 +9,10 @@ import { Form, FormResponse } from './entities/form.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { DriveModule } from './modules/drive/drive.module';
 import { SharedModule } from './shared/shared.module';
+import { Category, Project } from './entities/project.entity';
+import { Phase } from './entities/phase.entity';
+import { ProjectModule } from './modules/project/project.module';
+import { PhaseModule } from './modules/phase/phase.module';
 
 @Module({
   imports: [
@@ -25,7 +29,15 @@ import { SharedModule } from './shared/shared.module';
         username: configService.get('database.username'),
         password: configService.get('database.password'),
         database: configService.get('database.database'),
-        entities: [User, DriveItem, Form, FormResponse],
+        entities: [
+          User,
+          DriveItem,
+          Form,
+          FormResponse,
+          Project,
+          Phase,
+          Category,
+        ],
         synchronize: false,
       }),
       inject: [ConfigService],
@@ -38,6 +50,8 @@ import { SharedModule } from './shared/shared.module';
     AuthModule,
     DriveModule,
     SharedModule,
+    ProjectModule,
+    PhaseModule,
   ],
 })
 export class AppModule {}

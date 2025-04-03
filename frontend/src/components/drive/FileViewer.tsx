@@ -173,7 +173,7 @@ export default function FileViewer({
                                 variant="default"
                                 onClick={() => window.open(previewUrl, '_blank')}
                             >
-                                Open in new tab
+                                Mở ở tab mới
                             </Button>
                         </div>
                     ) : (

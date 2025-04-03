@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { QuestionType } from '../../entities/form.entity';
+import { uuid } from 'aws-sdk/clients/customerprofiles';
 
 export class QuestionDto {
   @IsUUID()
@@ -63,6 +64,10 @@ export class CreateFormDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  phaseId: string;
 
   @IsArray()
   @ValidateNested({ each: true })

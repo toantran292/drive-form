@@ -73,7 +73,7 @@ export default function ContextMenu({
                             className="w-full px-4 py-2 text-left flex items-center hover:bg-gray-100 text-gray-700"
                         >
                             <FiDownload className="mr-2" />
-                            Download
+                            Tải xuống
                         </button>
                     )}
                     {onShare && (
@@ -82,7 +82,7 @@ export default function ContextMenu({
                             className="w-full px-4 py-2 text-left flex items-center hover:bg-gray-100 text-gray-700"
                         >
                             <FiShare2 className="mr-2" />
-                            Share
+                            Chia sẻ
                         </button>
                     )}
                     {onDelete && (
@@ -91,7 +91,7 @@ export default function ContextMenu({
                             className="w-full px-4 py-2 text-left flex items-center hover:bg-gray-100 text-red-600"
                         >
                             <FiTrash2 className="mr-2" />
-                            Delete
+                            Xóa
                         </button>
                     )}
                 </>
@@ -101,7 +101,7 @@ export default function ContextMenu({
                     className="w-full px-4 py-2 text-left flex items-center hover:bg-gray-100 text-gray-700"
                 >
                     <FiFileText className="mr-2" />
-                    Create Form
+                    Tạo biểu mẫu
                 </button>
             )}
         </div>

@@ -5,23 +5,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useDrive } from '@/contexts/DriveContext';
+import axiosInstance from "@/lib/axios";
+import {useAuth} from "@/contexts/AuthContext";
+import {toast} from "sonner";
 
 interface CreateFormDialogProps {
     isOpen: boolean;
     onClose: () => void;
+    phaseId?: string;
 }
 
-export function CreateFormDialog({ isOpen, onClose }: CreateFormDialogProps) {
-    const [title, setTitle] = useState("");
+export function CreateFormDialog({ isOpen, onClose,phaseId }: CreateFormDialogProps) {
     const [loading, setLoading] = useState(false);
     const { handleCreateForm } = useDrive();
+    const { user } = useAuth()
+
+    const generatePhaseCode = () => {
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${(now.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}${now
+            .getHours()
+            .toString()
+            .padStart(2, "0")}${now.getMinutes().toString().padStart(2, "0")}`;
+        const emailPrefix = user?.email || "unknown";
+        return `${dateStr}-${emailPrefix}`;
+    };
+    const [title, setTitle] = useState(generatePhaseCode());
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setLoading(true);
-            await handleCreateForm(title);
+            if (phaseId) {
+                // Gọi API tạo form theo phase
+                await axiosInstance.post(`/phases/${phaseId}/forms`, {
+                    title,
+                })
+            } else {
+                // Gọi API mặc định qua DriveContext
+                await handleCreateForm(title);
+            }
             onClose();
+            toast.success("Biểu mẫu đã được tạo thành công.");
             setTitle(""); // Reset form
         } catch (error) {
             // Error already handled in hook
@@ -34,13 +60,13 @@ export function CreateFormDialog({ isOpen, onClose }: CreateFormDialogProps) {
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create New Form</DialogTitle>
+                    <DialogTitle>Tạo biểu mẫu mới</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Input
-                                placeholder="Enter form title"
+                                placeholder="Nhập tiêu đề biểu mẫu"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 autoFocus
@@ -55,10 +81,10 @@ export function CreateFormDialog({ isOpen, onClose }: CreateFormDialogProps) {
                             onClick={onClose}
                             disabled={loading}
                         >
-                            Cancel
+                            Đóng
                         </Button>
                         <Button type="submit" loading={loading}>
-                            Create
+                            Tạo
                         </Button>
                     </DialogFooter>
                 </form>

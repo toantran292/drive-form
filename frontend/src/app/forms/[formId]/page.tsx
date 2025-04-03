@@ -9,6 +9,9 @@ import { getForm, updateForm, Form } from '@/app/api/drive'
 import { toast } from 'sonner'
 import { useDebouncedCallback } from 'use-debounce'
 import { FormSettings, Question } from '@/types/form'
+import {getFormByPhase} from "@/components/forms/FormTable";
+import axiosInstance from "@/lib/axios";
+import axios from "@/lib/axios";
 
 export default function FormEditorPage() {
     const router = useRouter()
@@ -28,7 +31,8 @@ export default function FormEditorPage() {
         async function loadForm() {
             try {
                 setLoading(true)
-                const formData = await getForm(formId as string)
+                // const formData = await getForm(formId as string)
+                const formData = await getFormByPhase(formId as string)
                 setTitle(formData.title)
                 setDescription(formData.description || '')
                 setSettings(formData.settings)
@@ -64,9 +68,18 @@ export default function FormEditorPage() {
     const saveForm = async (updates: Partial<Form>) => {
         try {
             setSaving(true)
-            await updateForm(formId as string, updates)
+            // await updateForm(formId as string, updates)
+            // const isPhaseForm = !!data..phaseId;
+            // const endpoint = isPhaseForm
+            //     ? `/phases/${form.phaseId}/forms/${form.id}`
+            //     : `/drive/forms/${form.id}`;
+
+            delete updates.responses;
+
+            const response = await axios.patch(`phases/forms/${formId}`, updates);
             setHasUnsavedChanges(false)
             toast.success('Form saved successfully')
+            return response
         } catch (err) {
             console.error('Failed to save form:', err)
             toast.error('Failed to save form')
@@ -175,7 +188,7 @@ export default function FormEditorPage() {
                         onClick={handleManualSave}
                         className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                     >
-                        Save now
+                        Lưu
                     </button>
                 </div>
             )}
